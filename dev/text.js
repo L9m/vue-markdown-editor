@@ -2,6 +2,12 @@
 
 export default `<h1 align="center">Markdown Editor built on Vue</h1>
 
+<iframe height="300" style="width: 100%;" scrolling="no" title="Triangles and shades" src="https://codepen.io/ghaste/embed/mdZPOOL?default-tab=result" frameborder="no" loading="lazy" allowtransparency="true" allowfullscreen="true">
+  See the Pen <a href="https://codepen.io/ghaste/pen/mdZPOOL">
+  Triangles and shades</a> by Amit (<a href="https://codepen.io/ghaste">@ghaste</a>)
+  on <a href="https://codepen.io">CodePen</a>.
+</iframe>
+
 <p align="center">
   <a href="https://npmcharts.com/compare/@kangc/v-md-editor?minimal=true"><img src="https://img.shields.io/npm/dm/@kangc/v-md-editor.svg?sanitize=true" alt="Downloads"></a>
   <a href="https://www.npmjs.com/package/@kangc/v-md-editor"><img src="https://img.shields.io/npm/v/@kangc/v-md-editor.svg?sanitize=true" alt="Version"></a>

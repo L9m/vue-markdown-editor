@@ -66,6 +66,13 @@ VueMarkdownEditor.use(vuepressTheme, {
     vue: 'html',
   },
 });
+
+VueMarkdownEditor.xss.extend({
+  whiteList: {
+    iframe: ['src', 'width', 'height'],
+  },
+});
+
 // Preview.use(githubTheme);
 
 Vue.use(VueMarkdownEditor);

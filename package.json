@@ -1,5 +1,5 @@
 {
-  "name": "@kangc/v-md-editor",
+  "name": "@l9m/v-md-editor",
   "version": "1.7.12",
   "description": "A markdown editor built on Vue",
   "keywords": [
@@ -135,6 +135,7 @@
     "codemirror": "^5.61.0",
     "copy-to-clipboard": "^3.3.1",
     "highlight.js": "^10.7.1",
+    "incremental-dom": "^0.7.0",
     "insert-text-at-cursor": "^0.3.0",
     "katex": "^0.13.11",
     "markdown-it": "^12.0.6",

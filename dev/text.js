@@ -8,6 +8,8 @@ export default `<h1 align="center">Markdown Editor built on Vue</h1>
   on <a href="https://codepen.io">CodePen</a>.
 </iframe>
 
+<jsxgraph width="500" height="500">https://codepen.io/ghaste/embed/mdZPOOL?default-tab=result</jsxgraph>
+
 <p align="center">
   <a href="https://npmcharts.com/compare/@kangc/v-md-editor?minimal=true"><img src="https://img.shields.io/npm/dm/@kangc/v-md-editor.svg?sanitize=true" alt="Downloads"></a>
   <a href="https://www.npmjs.com/package/@kangc/v-md-editor"><img src="https://img.shields.io/npm/v/@kangc/v-md-editor.svg?sanitize=true" alt="Version"></a>

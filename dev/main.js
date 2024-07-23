@@ -39,6 +39,7 @@ import createHighLinesPlugin from '@/plugins/highlight-lines/';
 import '@/plugins/highlight-lines/highlight-lines';
 import createMermaidPlugin from '@/plugins/mermaid/cdn';
 import createAlignPlugin from '@/plugins/align';
+import createIncrementalDomPlugin from '@/plugins/incremental-dom/npm';
 
 import vuepressTheme from '@/theme/vuepress';
 import enUS from '@/lang/en-US';
@@ -53,7 +54,8 @@ VueMarkdownEditor.use(createEmojiPlugin())
   .use(createCopyCodePlugin())
   .use(createHighLinesPlugin())
   .use(createMermaidPlugin())
-  .use(createAlignPlugin());
+  .use(createAlignPlugin())
+  .use(createIncrementalDomPlugin());
 
 // VueMarkdownEditor.use(githubTheme, {
 //   codeHighlightExtensionMap: {
@@ -70,6 +72,7 @@ VueMarkdownEditor.use(vuepressTheme, {
 VueMarkdownEditor.xss.extend({
   whiteList: {
     iframe: ['src', 'width', 'height'],
+    jsxgraph: ['width', 'height'],
   },
 });
 

@@ -1,17 +1,11 @@
 <template>
-  <div
-    class="v-md-editor-preview"
-    :style="{
-      tabSize,
-      '-moz-tab-size': tabSize,
-      '-o-tab-size': tabSize
-    }"
-    @click="handlePreviewClick"
+  <div class="v-md-editor-preview" :style="{
+    tabSize,
+    '-moz-tab-size': tabSize,
+    '-o-tab-size': tabSize
+  }" @click="handlePreviewClick"
   >
-    <div
-      :class="[themeConfig.previewClass]"
-      v-html="html"
-    />
+    <div :class="[themeConfig.previewClass]" ref="preview" v-html="html" />
   </div>
 </template>
 
@@ -78,8 +72,16 @@ const component = {
   },
   methods: {
     handleTextChange() {
-      this.html = xss.process(this.markdownLoader(this.text));
-
+      if (this.markdownParser && this.markdownParser.IncrementalDOM && this.markdownParser.IncrementalDOMRenderer) {
+        this.$nextTick(() => {
+          this.markdownParser.IncrementalDOM.patch(
+            this.$refs.preview,
+            this.markdownParser.renderToIncrementalDOM(this.text)
+          );
+        });
+      } else {
+        this.html = xss.process(this.markdownLoader(this.text));
+      }
       this.$emit('change', this.text, this.html);
     },
   },

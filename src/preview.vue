@@ -9,6 +9,7 @@
     @click="handlePreviewClick"
   >
     <div
+      ref="preview"
       :class="[previewClass]"
       v-html="html"
     />
@@ -65,7 +66,16 @@ const component = {
   methods: {
     handleTextChange() {
       const next = (text) => {
-        this.html = xss.process(this.$options.vMdParser.parse(text));
+        if (this.vMdParser.themeConfig.markdownParser && this.vMdParser.themeConfig.markdownParser.IncrementalDOM && this.vMdParser.themeConfig.markdownParser.IncrementalDOMRenderer) {
+          this.$nextTick(() => {
+            this.vMdParser.themeConfig.markdownParser.IncrementalDOM.patch(
+              this.$refs.preview,
+              this.vMdParser.themeConfig.markdownParser.renderToIncrementalDOM(this.text)
+            );
+          });
+        } else {
+          this.html = xss.process(this.$options.vMdParser.parse(text));
+        }
 
         this.$emit('change', text, this.html);
       };

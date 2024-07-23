@@ -1578,7 +1578,7 @@
 
 "@babel/runtime@^7.0.0":
   version "7.14.6"
-  resolved "https://registry.nlark.com/@babel/runtime/download/@babel/runtime-7.14.6.tgz?cache=0&sync_timestamp=1623708247115&other_urls=https%3A%2F%2Fregistry.nlark.com%2F%40babel%2Fruntime%2Fdownload%2F%40babel%2Fruntime-7.14.6.tgz#535203bc0892efc7dec60bdc27b2ecf6e409062d"
+  resolved "https://registry.npmmirror.com/@babel/runtime/download/@babel/runtime-7.14.6.tgz?cache=0&sync_timestamp=1623708247115&other_urls=https%3A%2F%2Fregistry.nlark.com%2F%40babel%2Fruntime%2Fdownload%2F%40babel%2Fruntime-7.14.6.tgz#535203bc0892efc7dec60bdc27b2ecf6e409062d"
   integrity sha1-U1IDvAiS78fexgvcJ7Ls9uQJBi0=
   dependencies:
     regenerator-runtime "^0.13.4"
@@ -1893,7 +1893,7 @@
 
 "@popperjs/core@^2.9.2":
   version "2.9.2"
-  resolved "https://registry.npm.taobao.org/@popperjs/core/download/@popperjs/core-2.9.2.tgz?cache=0&sync_timestamp=1617290098226&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2F%40popperjs%2Fcore%2Fdownload%2F%40popperjs%2Fcore-2.9.2.tgz#adea7b6953cbb34651766b0548468e743c6a2353"
+  resolved "https://registry.npmmirror.com/@popperjs/core/download/@popperjs/core-2.9.2.tgz?cache=0&sync_timestamp=1617290098226&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2F%40popperjs%2Fcore%2Fdownload%2F%40popperjs%2Fcore-2.9.2.tgz#adea7b6953cbb34651766b0548468e743c6a2353"
   integrity sha1-rep7aVPLs0ZRdmsFSEaOdDxqI1M=
 
 "@sindresorhus/is@^0.14.0":
@@ -2142,17 +2142,17 @@
 
 "@vant/icons@^1.6.0":
   version "1.6.0"
-  resolved "https://registry.nlark.com/@vant/icons/download/@vant/icons-1.6.0.tgz?cache=0&sync_timestamp=1621321922501&other_urls=https%3A%2F%2Fregistry.nlark.com%2F%40vant%2Ficons%2Fdownload%2F%40vant%2Ficons-1.6.0.tgz#3db7eb7f963f51a2a08676720d5af9c4c3512feb"
+  resolved "https://registry.npmmirror.com/@vant/icons/download/@vant/icons-1.6.0.tgz?cache=0&sync_timestamp=1621321922501&other_urls=https%3A%2F%2Fregistry.nlark.com%2F%40vant%2Ficons%2Fdownload%2F%40vant%2Ficons-1.6.0.tgz#3db7eb7f963f51a2a08676720d5af9c4c3512feb"
   integrity sha1-Pbfrf5Y/UaKghnZyDVr5xMNRL+s=
 
 "@vant/lazyload@^1.2.0":
   version "1.2.0"
-  resolved "https://registry.nlark.com/@vant/lazyload/download/@vant/lazyload-1.2.0.tgz?cache=0&sync_timestamp=1620007499934&other_urls=https%3A%2F%2Fregistry.nlark.com%2F%40vant%2Flazyload%2Fdownload%2F%40vant%2Flazyload-1.2.0.tgz#62e9779bd7844ad8f71c2ca2bf852e6147c7a86d"
+  resolved "https://registry.npmmirror.com/@vant/lazyload/download/@vant/lazyload-1.2.0.tgz?cache=0&sync_timestamp=1620007499934&other_urls=https%3A%2F%2Fregistry.nlark.com%2F%40vant%2Flazyload%2Fdownload%2F%40vant%2Flazyload-1.2.0.tgz#62e9779bd7844ad8f71c2ca2bf852e6147c7a86d"
   integrity sha1-Yul3m9eEStj3HCyiv4UuYUfHqG0=
 
 "@vant/popperjs@^1.1.0":
   version "1.1.0"
-  resolved "https://registry.npm.taobao.org/@vant/popperjs/download/@vant/popperjs-1.1.0.tgz?cache=0&sync_timestamp=1617712371368&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2F%40vant%2Fpopperjs%2Fdownload%2F%40vant%2Fpopperjs-1.1.0.tgz#b4edee5bbfa6fb18705986e313d4fd5f17942a0f"
+  resolved "https://registry.npmmirror.com/@vant/popperjs/download/@vant/popperjs-1.1.0.tgz?cache=0&sync_timestamp=1617712371368&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2F%40vant%2Fpopperjs%2Fdownload%2F%40vant%2Fpopperjs-1.1.0.tgz#b4edee5bbfa6fb18705986e313d4fd5f17942a0f"
   integrity sha1-tO3uW7+m+xhwWYbjE9T9XxeUKg8=
   dependencies:
     "@popperjs/core" "^2.9.2"
@@ -2169,7 +2169,7 @@
 
 "@vant/use@^1.1.2":
   version "1.2.0"
-  resolved "https://registry.nlark.com/@vant/use/download/@vant/use-1.2.0.tgz#c762c85aa5beda8e847ed553793acad7bfde2d07"
+  resolved "https://registry.npmmirror.com/@vant/use/download/@vant/use-1.2.0.tgz#c762c85aa5beda8e847ed553793acad7bfde2d07"
   integrity sha1-x2LIWqW+2o6EftVTeTrK17/eLQc=
 
 "@vue/babel-helper-vue-jsx-merge-props@^1.2.1":
@@ -3155,7 +3155,7 @@ babel-plugin-dynamic-import-node@^2.3.3:
 
 babel-plugin-import@^1.13.3:
   version "1.13.3"
-  resolved "https://registry.npm.taobao.org/babel-plugin-import/download/babel-plugin-import-1.13.3.tgz?cache=0&sync_timestamp=1606209944483&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fbabel-plugin-import%2Fdownload%2Fbabel-plugin-import-1.13.3.tgz#9dbbba7d1ac72bd412917a830d445e00941d26d7"
+  resolved "https://registry.npmmirror.com/babel-plugin-import/download/babel-plugin-import-1.13.3.tgz?cache=0&sync_timestamp=1606209944483&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fbabel-plugin-import%2Fdownload%2Fbabel-plugin-import-1.13.3.tgz#9dbbba7d1ac72bd412917a830d445e00941d26d7"
   integrity sha1-nbu6fRrHK9QSkXqDDUReAJQdJtc=
   dependencies:
     "@babel/helper-module-imports" "^7.0.0"
@@ -7422,6 +7422,11 @@ imurmurhash@^0.1.4:
   version "0.1.4"
   resolved "https://registry.yarnpkg.com/imurmurhash/-/imurmurhash-0.1.4.tgz#9218b9b2b928a238b13dc4fb6b6d576f231453ea"
   integrity sha1-khi5srkoojixPcT7a21XbyMUU+o=
+
+incremental-dom@^0.7.0:
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/incremental-dom/-/incremental-dom-0.7.0.tgz#b03664731bdc430035f32df7d76fa56daedee9b8"
+  integrity sha512-SBHQ6AiCmtwh7TU9hjq2CspasJe7ggGa9k+qYZft+d5Qq9v7V+07wlnRSZH5GGYjI8wn6U5p7dDua7f1bih52g==
 
 indent-string@^2.1.0:
   version "2.1.0"
@@ -13508,7 +13513,7 @@ validate-npm-package-license@^3.0.1:
 
 vant@^3.1.3:
   version "3.1.3"
-  resolved "https://registry.nlark.com/vant/download/vant-3.1.3.tgz?cache=0&other_urls=https%3A%2F%2Fregistry.nlark.com%2Fvant%2Fdownload%2Fvant-3.1.3.tgz#c87a1b86bbf0e3c139a519d89e310427fa36d8b3"
+  resolved "https://registry.npmmirror.com/vant/download/vant-3.1.3.tgz?cache=0&other_urls=https%3A%2F%2Fregistry.nlark.com%2Fvant%2Fdownload%2Fvant-3.1.3.tgz#c87a1b86bbf0e3c139a519d89e310427fa36d8b3"
   integrity sha1-yHobhrvw48E5pRnYnjEEJ/o22LM=
   dependencies:
     "@vant/icons" "^1.6.0"

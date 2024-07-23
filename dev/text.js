@@ -8,6 +8,12 @@ export default `<h1 align="center">Markdown Editor built on Vue</h1>
   <a href="https://www.npmjs.com/package/@kangc/v-md-editor"><img src="https://img.shields.io/npm/l/@kangc/v-md-editor.svg?sanitize=true" alt="License"></a>
 </p>
 
+<iframe height="300" style="width: 100%;" scrolling="no" title="Untitled" src="https://codepen.io/aymak/embed/xxBBmRr?default-tab=result" frameborder="no" loading="lazy" allowtransparency="true" allowfullscreen="true">
+  See the Pen <a href="https://codepen.io/aymak/pen/xxBBmRr">
+  Untitled</a> by Paul Slaymaker (<a href="https://codepen.io/aymak">@aymak</a>)
+  on <a href="https://codepen.io">CodePen</a>.
+</iframe>
+
 ## Links
 
 - [Demo](https://code-farmer-i.github.io/vue-markdown-editor/examples/base-editor.html)

@@ -19,6 +19,7 @@ import '@/plugins/highlight-lines/highlight-lines';
 import createMermaidPlugin from '@/plugins/mermaid/cdn';
 
 import createCreateCopyCodePreview from '@/plugins/copy-code/preview';
+import createIncrementalDomPlugin from '@/plugins/incremental-dom/npm';
 
 import vuepressTheme from '@/theme/vuepress';
 import enUS from '@/lang/en-US';
@@ -72,9 +73,17 @@ VueMarkdownEditor.use(createEmojiPlugin())
   .use(createLineNumberPlugin())
   .use(createCopyCodePlugin())
   .use(createHighLinesPlugin())
-  .use(createMermaidPlugin());
+  .use(createMermaidPlugin())
+  .use(createIncrementalDomPlugin());
 
 VueMarkdownEditor.Codemirror = Codemirror;
+
+VueMarkdownEditor.xss.extend({
+  // 扩展白名单
+  whiteList: {
+    iframe: ['src', 'width', 'height'],
+  },
+});
 
 app.use(VueMarkdownEditor);
 app.use(PreviewHtml);

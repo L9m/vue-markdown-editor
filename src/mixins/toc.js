@@ -19,7 +19,11 @@ export default {
       handler(newval, oldVal) {
         // render in the first time
         if (typeof oldVal === 'undefined') {
-          this.$nextTick(this.updateTocNav);
+          this.$nextTick(() => {
+            setTimeout(() => {
+              this.updateTocNav();
+            });
+          });
           return;
         }
 

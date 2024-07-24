@@ -1,6 +1,8 @@
 <template>
   <div>
+    <button @click="load">加载</button>
     <v-md-editor
+      :include-level="[1,2, 3, 4, 5, 6]"
       v-model="text"
       height="500px"
       autofocus
@@ -47,6 +49,25 @@ export default {
     },
     handleCopyCodeSuccess(code) {
       console.log(code);
+    },
+    async load() {
+      this.text = '';
+      let size = 1;
+      let start = 0;
+
+      // this.text = '<iframe src="https://markdown.com.cn/basic-syntax/" width="500" height="500"></iframe>'
+
+      async function* processChunk() {
+        while (start < text.length) {
+          await new Promise((resolve) => setTimeout(resolve, 50));
+          this.text += text.substring(start, (start += size));
+          yield start;
+        }
+      }
+
+      for await (const pos of processChunk.call(this)) {
+        console.log('pos', text[pos]);
+      }
     },
   },
 };

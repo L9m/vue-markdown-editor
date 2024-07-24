@@ -64,6 +64,9 @@ VueMarkdownEditor.use(vuepressTheme, {
   codeHighlightExtensionMap: {
     vue: 'markup',
   },
+  toc: {
+    includeLevel: [1, 2, 3, 4, 5, 6],
+  },
 });
 // Preview.use(githubTheme);
 

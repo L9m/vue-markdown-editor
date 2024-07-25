@@ -48,23 +48,10 @@ export function renderer(incrementalDom) {
     }
   );
 
-  function validateHTML(htmlString){
-    try {
-      let parser = new DOMParser();
-      let doc = parser.parseFromString(htmlString, "application/xml");
-      let errorNode = doc.querySelector('parsererror');
-      return !errorNode
-    } catch(err) {
-      console.warn('HTML validation error: ', err)
-      return false
-    }
-}
-    
   const wrapIncrementalDOM = (html) => {
     if (typeof html === 'function') {
       html()
     } else {
-      if (!validateHTML(html)) return;
       iDOMParser.write(xss.process(html))
     }
   };

@@ -6,8 +6,7 @@ export default function parserCreator(katex) {
       if (katex) {
         mdParser.use(markdownItKatex, {
           ...katexOptions,
-          katex,
-        });
+        }, katex);
       }
     });
   };

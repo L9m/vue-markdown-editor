@@ -71,7 +71,10 @@ VueMarkdownEditor.use(vuepressTheme, {
 // Preview.use(githubTheme);
 
 VueMarkdownEditor.use(createEmojiPlugin())
-  .use(createKatexPlugin())
+  .use(createKatexPlugin({
+    useWebWorker: true,
+    throwOnError: true,
+  }))
   .use(createTodoListPlugin())
   .use(createLineNumberPlugin())
   .use(createCopyCodePlugin())

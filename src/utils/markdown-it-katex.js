@@ -284,7 +284,7 @@ function inlineMathBlock(state, silent) {
     return false;
   }
 
-  res = isValidBlockDelim(state, state.pos + 1);
+  res = isValidBlockDelim(state, state.pos);
   if (!res.can_open) {
     if (!silent) {
       state.pending += '$$';

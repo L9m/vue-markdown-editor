@@ -1,6 +1,6 @@
 {
   "name": "@l9m/v-md-editor",
-  "version": "3.1.7",
+  "version": "3.1.8",
   "description": "A markdown editor built on Vue",
   "main": "lib/base-editor.js",
   "keywords": [

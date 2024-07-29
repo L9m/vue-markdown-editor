@@ -2,6 +2,8 @@
 
 export default `<p>$a+a=c$</p>
 
+1.$\\sin\\left(\\frac{\\pi}{4}\\right) = \\frac{\\sqrt{2}}{2}$ 2. $\\cos\\left(\\frac{\\pi}{4}\\right) = \\frac{\\sqrt{2}}{2}$
+
 <p>3$a+a=c$4</p>
 
 <p>1$$a+a=c$$2</p>

@@ -39,7 +39,7 @@ import createHighLinesPlugin from '@/plugins/highlight-lines/';
 import '@/plugins/highlight-lines/highlight-lines';
 import createMermaidPlugin from '@/plugins/mermaid/cdn';
 import createAlignPlugin from '@/plugins/align';
-import createIncrementalDomPlugin from '@/plugins/incremental-dom/npm';
+// import createIncrementalDomPlugin from '@/plugins/incremental-dom/npm';
 
 import vuepressTheme from '@/theme/vuepress';
 import enUS from '@/lang/en-US';
@@ -48,14 +48,18 @@ VueMarkdownEditor.Codemirror = Codemirror;
 VueMarkdownEditor.lang.use('en-US', enUS);
 
 VueMarkdownEditor.use(createEmojiPlugin())
-  .use(createKatexPlugin())
+  .use(createKatexPlugin({
+    enableMathBlockInHtml: true,
+    enableMathInlineInHtml: true,
+    enableFencedBlocks: true,
+  }))
   .use(createTodoListPlugin())
   .use(createLineNumberPlugin())
   .use(createCopyCodePlugin())
   .use(createHighLinesPlugin())
   .use(createMermaidPlugin())
-  .use(createAlignPlugin())
-  .use(createIncrementalDomPlugin());
+  .use(createAlignPlugin());
+  // .use(createIncrementalDomPlugin());
 
 // VueMarkdownEditor.use(githubTheme, {
 //   codeHighlightExtensionMap: {

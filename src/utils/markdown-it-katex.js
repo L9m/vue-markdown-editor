@@ -104,6 +104,7 @@ function inlineMath(state, silent) {
     match += 1;
   }
 
+
   // No closing delimter found.  Consume $ and continue.
   if (match === -1) {
     if (!silent) {
@@ -402,6 +403,9 @@ function inlineBareBlock(state, silent) {
 function inlineBracket(state, silent) {
     var start, match, token, pos;
 
+
+    //@todo 需要判断是否可以作为开始和结束符号 和检测是否在 html 中
+
     if (state.src.slice(state.pos, state.pos + 2) !== '\\(') {
         return false;
     }
@@ -426,13 +430,16 @@ function inlineBracket(state, silent) {
     }
 
     if (match === -1) {
-        state.pos = start;
-        return false;
+      if (!silent) {
+        state.pending += '\\(';
+      }
+      state.pos = start;
+      return true;
     }
 
     if (match - start === 0) {
         if (!silent) {
-          state.pending += '$$';
+          state.pending += '\\(\\(';
         }
         state.pos = start + 2;
         return true;
@@ -441,7 +448,7 @@ function inlineBracket(state, silent) {
     if (!silent) {
         token = state.push('math_bracket_inline', 'math', 0);
         token.block = true;
-        token.markup = '$';
+        token.markup = '()';
         token.content = state.src.slice(start, match);
     }
 
@@ -450,20 +457,14 @@ function inlineBracket(state, silent) {
     return true;
 }
 
-function blockBracketMath(state, startLine, endLine, silent) {
-  // bMarks 记录表示每一行的起始位置
-  // tShift 记录表示表示每一行第一个非空格字符的位置
-  // eMarks 记录表示每一行第一个非空格字符的位置
-  let start = state.bMarks[startLine] + state.tShift[startLine]; // 本行字符的起始位置
-  let max = state.eMarks[startLine]; // 本行最后一个字符的位置
-  let pos = start;
-  let firstLine;
-  let found;
-  let next;
-  let token;
-  let lastPos;
-  let attrsStr;
-  let lastLine;
+function blockBracketMath(state, start, end, silent) {
+  var lastLine,
+    next,
+    lastPos,
+    found = false,
+    token,
+    pos = state.bMarks[start] + state.tShift[start],
+    max = state.eMarks[start];
 
   const startMarkup = '\\[';
   const endMarkup = '\\]';
@@ -479,7 +480,7 @@ function blockBracketMath(state, startLine, endLine, silent) {
 
   pos += len;
 
-  firstLine = state.src.slice(pos, max);
+  let firstLine = state.src.slice(pos, max);
 
   if (silent) {
     return true;
@@ -490,10 +491,10 @@ function blockBracketMath(state, startLine, endLine, silent) {
     found = true;
   }
 
-  for (next = startLine; !found; ) {
+  for (next = start; !found; ) {
     next++;
 
-    if (next >= endLine) {
+    if (next >= end) {
       break;
     }
 
@@ -511,6 +512,10 @@ function blockBracketMath(state, startLine, endLine, silent) {
       // 取闭合标签位置内容
       lastLine = state.src.slice(pos, lastPos);
       found = true;
+    } else if (state.src.slice(pos, max).trim().includes(endMarkup)) {
+      lastPos = state.src.slice(0, max).indexOf(endMarkup);
+      lastLine = state.src.slice(pos, lastPos);
+      found = true;
     }
   }
 
@@ -524,7 +529,7 @@ function blockBracketMath(state, startLine, endLine, silent) {
     (lastLine && lastLine.trim() ? lastLine : '');
 
   token.map = [start, state.line];
-  token.markup = '$$';
+  token.markup = '[]';
   return true;
 }
 
@@ -534,6 +539,8 @@ function inlineBracketBlock(state, silent) {
   if (state.src.slice(state.pos, state.pos + 2) !== '\\[') {
     return false;
   }
+
+  //@todo 需要判断是否可以作为开始和结束符号
 
   start = state.pos + 2;
   match = start
@@ -554,13 +561,16 @@ function inlineBracketBlock(state, silent) {
   }
   
   if (match === -1) {
+    if (!silent) {
+      state.pending += '\\[';
+    }
     state.pos = start;
-    return false;
+    return true;
   }
   
   if (match - start === 0) {
     if (!silent) {
-      state.pending += '$$';
+      state.pending += '\\[\\[';
     }
     state.pos = start + 2;
     return true;
@@ -570,7 +580,7 @@ function inlineBracketBlock(state, silent) {
 if (!silent) {
   token = state.push('math_bracket_inline_block', 'math', 0);
   token.block = true;
-  token.markup = '$$';
+  token.markup = '[]';
   token.content = state.src.slice(start, match);
 }
 

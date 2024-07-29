@@ -462,7 +462,7 @@ function blockBracketMath(state, startLine, endLine, silent) {
   let found;
   let next;
   let token;
-  let attrsStr;
+  let lastPos;
   let lastLine;
 
   const startMarkup = '\\[';

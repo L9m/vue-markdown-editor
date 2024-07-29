@@ -425,8 +425,6 @@ function inlineBracket(state, silent) {
         match += 2;
     }
 
-    console.log(match)
-
     if (match === -1) {
         state.pos = start;
         return false;

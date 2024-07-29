@@ -100,4 +100,5 @@ export const svgAttrWhiteList = [
   'filter',
   'href',
   'xlink:href',
+  'preserveaspectratio'
 ];

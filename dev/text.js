@@ -1,18 +1,46 @@
 /* eslint-disable */
 
-export default `<h1 align="center">Markdown Editor built on Vue</h1>
+export default `
+
+$$a+a=c$$
+
+$a+a=c$
+
+
+\\(x=\\frac {-b\\pm \\sqrt {{b}^{2}-4ac}} {2a}\\)
+
+\\[x=\\frac {-b\\pm \\sqrt {{b}^{2}-4ac}} {2a}\\]
+
+
+111 \\(x=\\frac {-b\\pm \\sqrt {{b}^{2}-4ac}} {2a}\\)11111111111111111111
+
+
+
+\\[x=\\frac {-b\\pm \\sqrt {{b}^{2}-4ac}} {2a}\\]
+
+
+2222 \\[x=\\frac {-b\\pm \\sqrt {{b}^{2}-4ac}} {2a}\\] 4444444
+
+
+| Syntax      | \\(x=\\frac {-b\\pm \\sqrt {{b}^{2}-4ac}} {2a}\\) |
+| ----------- | ----------- |
+| \\(x=\\frac {-b\\pm \\sqrt {{b}^{2}-4ac}} {2a}\\) aa \\(x=\\frac {-b\\pm \\sqrt {{b}^{2}-4ac}} {2a}\\)      | aa \\[x=\\frac {-b\\pm \\sqrt {{b}^{2}-4ac}} {2a}\\]bb \\[x=\\frac {-b\\pm \\sqrt {{b}^{2}-4ac}} {2a}\\]      |
+| \\(x=\\frac {-b\\pm \\sqrt {{b}^{2}-4ac}} {2a}\\) \\(x=\\frac {-b\\pm \\sqrt {{b}^{2}-4ac}} {2a}\\)   | \\(x=\\frac {-b\\pm \\sqrt {{b}^{2}-4ac}} {2a}\\) \\(x=\\frac {-b\\pm \\sqrt {{b}^{2}-4ac}} {2a}\\)        |
+
+
+1. 对于$\\sqrt{1+x}$，我们需要确保根号内的表达式非负，即解析原文+x \geq 0$，解得$x \geq -1$。
+
+<h1 align="center">Markdown Editor built on Vue \\[x=\\frac {-b\\pm \\sqrt {{b}^{2}-4ac}} {2a}\\]</h1>
+
+
+1. 对于$\\sqrt{1+x}$，我们需要确保根号内的表达式非负，即解析原文+x \\geq 0$，解得$x \\geq -1$。
+
 
 <p align="center">
   <a href="https://npmcharts.com/compare/@kangc/v-md-editor?minimal=true"><img src="https://img.shields.io/npm/dm/@kangc/v-md-editor.svg?sanitize=true" alt="Downloads"></a>
   <a href="https://www.npmjs.com/package/@kangc/v-md-editor"><img src="https://img.shields.io/npm/v/@kangc/v-md-editor.svg?sanitize=true" alt="Version"></a>
   <a href="https://www.npmjs.com/package/@kangc/v-md-editor"><img src="https://img.shields.io/npm/l/@kangc/v-md-editor.svg?sanitize=true" alt="License"></a>
 </p>
-
-<iframe height="300" style="width: 100%;" scrolling="no" title="Untitled" src="https://codepen.io/aymak/embed/xxBBmRr?default-tab=result" frameborder="no" loading="lazy" allowtransparency="true" allowfullscreen="true">
-  See the Pen <a href="https://codepen.io/aymak/pen/xxBBmRr">
-  Untitled</a> by Paul Slaymaker (<a href="https://codepen.io/aymak">@aymak</a>)
-  on <a href="https://codepen.io">CodePen</a>.
-</iframe>
 
 ## Links
 

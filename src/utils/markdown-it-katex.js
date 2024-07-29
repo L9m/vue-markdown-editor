@@ -24,7 +24,7 @@ function isValidInlineDelim(state, pos) {
 
   if (
     nextChar !== '$' &&
-    (nextChar == undefined || isWhitespace(nextChar))
+    (nextChar == undefined || isWhitespace(nextChar) || !isWordCharacterOrNumber(nextChar))
   ) {
     canClose = true;
   }
@@ -87,7 +87,6 @@ function inlineMath(state, silent) {
   // be the first character in state.src, which is known since
   // we have found an opening delimieter already.
   let start = state.pos + 1;
-  console.log(state.pos)
   let match = start;
   let pos;
   while ((match = state.src.indexOf('$', match)) !== -1) {
@@ -105,7 +104,6 @@ function inlineMath(state, silent) {
     match += 1;
   }
 
-  console.log(start, match)
 
   // No closing delimter found.  Consume $ and continue.
   if (match === -1) {
@@ -127,7 +125,6 @@ function inlineMath(state, silent) {
 
   // Check for valid closing delimiter
   res = isValidInlineDelim(state, match);
-  console.log(start, match, res)
   if (!res.can_close) {
     if (!silent) {
       state.pending += '$';
@@ -135,8 +132,6 @@ function inlineMath(state, silent) {
     state.pos = start;
     return true;
   }
-
-  console.log(start, match)
 
   if (!silent) {
     const token = state.push('math_inline', 'math', 0);

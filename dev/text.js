@@ -1,6 +1,7 @@
 /* eslint-disable */
 
-export default `<p>$a+a=c$</p>
+export default `
+<p>$a+a=c$</p>
 
 1.$\\sin\\left(\\frac{\\pi}{4}\\right) = \\frac{\\sqrt{2}}{2}$ 2. $\\cos\\left(\\frac{\\pi}{4}\\right) = \\frac{\\sqrt{2}}{2}$
 

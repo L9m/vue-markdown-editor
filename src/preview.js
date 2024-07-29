@@ -5,7 +5,7 @@ import Lang from '@/lang/';
 // font css
 import '@/assets/css/font';
 
-const version = '2.4.3';
+const version = '2.4.4-beta.0';
 
 const install = (Vue) => {
   Vue.component(Component.name, Component);

@@ -461,6 +461,7 @@ function blockBracketMath(state, startLine, endLine, silent) {
   let found;
   let next;
   let token;
+  let lastPos;
   let attrsStr;
   let lastLine;
 

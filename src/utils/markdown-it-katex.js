@@ -608,11 +608,13 @@ function handleMathInHtml(state, mathType, mathMarkup, mathRegex) {
     const currentToken = tokens[index];
     const newTokens = [];
 
-    if (currentToken.type !== 'html_block') {
+
+    if (currentToken.type !== 'html_block' && currentToken.type !== 'inline') {
       continue;
     }
 
-    const content = currentToken.content;
+    let type = currentToken.type === 'inline' ? 'html_inline' : 'html_block';
+    const content = currentToken.content
 
     // Process for each math referenced within the html block
     for (const match of content.matchAll(mathRegex)) {
@@ -627,7 +629,7 @@ function handleMathInHtml(state, mathType, mathMarkup, mathRegex) {
       if (html_before_math) {
         newTokens.push({
           ...currentToken,
-          type: 'html_block',
+          type,
           map: null,
           content: html_before_math,
         });
@@ -648,7 +650,7 @@ function handleMathInHtml(state, mathType, mathMarkup, mathRegex) {
       if (html_after_math) {
         newTokens.push({
           ...currentToken,
-          type: 'html_block',
+          type,
           map: null,
           content: html_after_math,
         });

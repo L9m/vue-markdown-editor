@@ -197,6 +197,10 @@ function blockMath(state, start, end, silent) {
     }
   }
 
+  if (!found) {
+    return false;
+  }
+
   state.line = next + 1;
 
   token = state.push('math_block', 'math', 0);
@@ -517,6 +521,10 @@ function blockBracketMath(state, start, end, silent) {
       lastLine = state.src.slice(pos, lastPos);
       found = true;
     }
+  }
+
+  if (!found) {
+    return false;
   }
 
   state.line = next + 1;

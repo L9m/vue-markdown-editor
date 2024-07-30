@@ -104,7 +104,6 @@ function inlineMath(state, silent) {
     match += 1;
   }
 
-
   // No closing delimter found.  Consume $ and continue.
   if (match === -1) {
     if (!silent) {
@@ -169,6 +168,9 @@ function blockMath(state, start, end, silent) {
     // Single line expression
     firstLine = firstLine.trim().slice(0, -2);
     found = true;
+  } else if (firstLine.trim().indexOf('$$', 2) >= 0) {
+    // inline return false
+    return false;
   }
 
   for (next = start; !found; ) {
@@ -405,60 +407,57 @@ function inlineBareBlock(state, silent) {
 }
 
 function inlineBracket(state, silent) {
-    var start, match, token, pos;
+  var start, match, token, pos;
 
+  //@todo 需要判断是否可以作为开始和结束符号 和检测是否在 html 中
 
-    //@todo 需要判断是否可以作为开始和结束符号 和检测是否在 html 中
+  if (state.src.slice(state.pos, state.pos + 2) !== '\\(') {
+    return false;
+  }
 
-    if (state.src.slice(state.pos, state.pos + 2) !== '\\(') {
-        return false;
+  start = state.pos + 2;
+  match = start;
+
+  while ((match = state.src.indexOf('\\)', match)) !== -1) {
+    // Found potential $$, look for escapes, pos will point to
+    // first non escape when complete
+    pos = match - 1;
+    while (state.src[pos] === '\\') {
+      pos -= 1;
     }
 
-    start = state.pos + 2;
-    match = start
-
-
-    while ((match = state.src.indexOf('\\)', match)) !== -1) {
-        // Found potential $$, look for escapes, pos will point to
-        // first non escape when complete
-        pos = match - 1;
-        while (state.src[pos] === '\\') {
-            pos -= 1;
-        }
-
-        if ((match - pos) % 2 == 1) {
-            break;
-        }
-
-        match += 2;
+    if ((match - pos) % 2 == 1) {
+      break;
     }
 
-    if (match === -1) {
-      if (!silent) {
-        state.pending += '\\(';
-      }
-      state.pos = start;
-      return true;
-    }
+    match += 2;
+  }
 
-    if (match - start === 0) {
-        if (!silent) {
-          state.pending += '\\(\\(';
-        }
-        state.pos = start + 2;
-        return true;
-    }
-
+  if (match === -1) {
     if (!silent) {
-        token = state.push('math_bracket_inline', 'math', 0);
-        token.block = true;
-        token.markup = '()';
-        token.content = state.src.slice(start, match);
+      state.pending += '\\(';
     }
-
-
-    state.pos = match + 2;
+    state.pos = start;
     return true;
+  }
+
+  if (match - start === 0) {
+    if (!silent) {
+      state.pending += '\\(\\(';
+    }
+    state.pos = start + 2;
+    return true;
+  }
+
+  if (!silent) {
+    token = state.push('math_bracket_inline', 'math', 0);
+    token.block = true;
+    token.markup = '()';
+    token.content = state.src.slice(start, match);
+  }
+
+  state.pos = match + 2;
+  return true;
 }
 
 function blockBracketMath(state, start, end, silent) {
@@ -493,6 +492,9 @@ function blockBracketMath(state, start, end, silent) {
   if (firstLine.trim().slice(-len) === endMarkup) {
     firstLine = firstLine.trim().slice(0, -len);
     found = true;
+  } else if (firstLine.trim().indexOf(endMarkup, len) >= 0) {
+    // inline return false
+    return false;
   }
 
   for (next = start; !found; ) {
@@ -543,7 +545,7 @@ function blockBracketMath(state, start, end, silent) {
 
 function inlineBracketBlock(state, silent) {
   var start, match, token, pos;
-  
+
   if (state.src.slice(state.pos, state.pos + 2) !== '\\[') {
     return false;
   }
@@ -551,8 +553,8 @@ function inlineBracketBlock(state, silent) {
   //@todo 需要判断是否可以作为开始和结束符号
 
   start = state.pos + 2;
-  match = start
-  
+  match = start;
+
   while ((match = state.src.indexOf('\\]', match)) !== -1) {
     // Found potential $$, look for escapes, pos will point to
     // first non escape when complete
@@ -560,14 +562,14 @@ function inlineBracketBlock(state, silent) {
     while (state.src[pos] === '\\') {
       pos -= 1;
     }
-  
+
     if ((match - pos) % 2 == 1) {
       break;
     }
-  
+
     match += 2;
   }
-  
+
   if (match === -1) {
     if (!silent) {
       state.pending += '\\[';
@@ -575,28 +577,24 @@ function inlineBracketBlock(state, silent) {
     state.pos = start;
     return true;
   }
-  
+
   if (match - start === 0) {
     if (!silent) {
       state.pending += '\\[\\[';
     }
     state.pos = start + 2;
     return true;
-}
+  }
 
-  
-if (!silent) {
-  token = state.push('math_bracket_inline_block', 'math', 0);
-  token.block = true;
-  token.markup = '[]';
-  token.content = state.src.slice(start, match);
-}
+  if (!silent) {
+    token = state.push('math_bracket_inline_block', 'math', 0);
+    token.block = true;
+    token.markup = '[]';
+    token.content = state.src.slice(start, match);
+  }
 
-
-state.pos = match + 2;
-return true;
-
-
+  state.pos = match + 2;
+  return true;
 }
 
 // For any html block that contains math, replace the html block token with new tokens that separate out
@@ -608,12 +606,11 @@ function handleMathInHtml(state, mathType, mathMarkup, mathRegex) {
     const currentToken = tokens[index];
     const newTokens = [];
 
-
     if (currentToken.type !== 'html_block' && currentToken.type !== 'inline') {
       continue;
     }
 
-    const content = currentToken.content
+    const content = currentToken.content;
 
     // Process for each math referenced within the html block
     for (const match of content.matchAll(mathRegex)) {
@@ -713,10 +710,9 @@ export default function (md, options) {
     }
   );
 
-     
   md.block.ruler.after('blockquote', 'math_bracket_block', blockBracketMath, {
     alt: ['paragraph', 'reference', 'blockquote', 'list'],
-});
+  });
 
   // Regex to capture any html prior to math block, the math block (single or multi line), and any html after the math block
   const math_block_within_html_regex = /(?<html_before_math>[\s\S]*?)\$\$(?<math>[\s\S]+?)\$\$(?<html_after_math>(?:(?!\$\$[\s\S]+?\$\$)[\s\S])*)/gm;
@@ -746,9 +742,9 @@ export default function (md, options) {
       if (options.throwOnError) {
         console.log(error);
       }
-      return `<span class="katex-error" title="${escapeHtml(latex)}">${ displayError ? escapeHtml(
-        error + ''
-      ): escapeHtml(latex)}</span>`
+      return `<span class="katex-error" title="${escapeHtml(latex)}">${
+        displayError ? escapeHtml(error + '') : escapeHtml(latex)
+      }</span>`;
     }
   };
 
@@ -766,9 +762,9 @@ export default function (md, options) {
       if (options.throwOnError) {
         console.log(error);
       }
-      return  `<p class="katex-block katex-error" title="${escapeHtml(latex)}">${displayError ? escapeHtml(
-        error + ''
-      ) : escapeHtml(latex)}</p>`;
+      return `<p class="katex-block katex-error" title="${escapeHtml(latex)}">${
+        displayError ? escapeHtml(error + '') : escapeHtml(latex)
+      }</p>`;
     }
   };
 

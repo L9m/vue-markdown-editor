@@ -613,7 +613,6 @@ function handleMathInHtml(state, mathType, mathMarkup, mathRegex) {
       continue;
     }
 
-    let type = currentToken.type === 'inline' ? 'html_inline' : 'html_block';
     const content = currentToken.content
 
     // Process for each math referenced within the html block
@@ -625,6 +624,8 @@ function handleMathInHtml(state, mathType, mathMarkup, mathRegex) {
       const html_before_math = match.groups.html_before_math;
       const math = match.groups.math;
       const html_after_math = match.groups.html_after_math;
+
+      let type = mathType === 'math_block' ? 'html_block' : 'html_inline';
 
       if (html_before_math) {
         newTokens.push({

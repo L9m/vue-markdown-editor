@@ -73,7 +73,8 @@ VueMarkdownEditor.use(vuepressTheme, {
 VueMarkdownEditor.use(createEmojiPlugin())
   .use(createKatexPlugin({
     enableMathBlockInHtml: true,
-    enableMathInlineInHtml: true
+    enableMathInlineInHtml: true,
+    strict: false
   }))
   .use(createTodoListPlugin())
   .use(createLineNumberPlugin())

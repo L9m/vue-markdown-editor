@@ -66,12 +66,12 @@ function inlineMath(state, silent) {
 
   const lastToken = state.tokens.at(-1);
 
-  if (lastToken?.type === 'html_inline') {
-    // We may be inside of inside of inline html
-    if (/^<\w+.+[^/]>$/.test(lastToken.content)) {
-      return false;
-    }
-  }
+  // if (lastToken?.type === 'html_inline') {
+  //   // We may be inside of inside of inline html
+  //   if (/^<\w+.+[^/]>$/.test(lastToken.content)) {
+  //     return false;
+  //   }
+  // }
 
   let res = isValidInlineDelim(state, state.pos);
   if (!res.can_open) {
@@ -606,7 +606,7 @@ function handleMathInHtml(state, mathType, mathMarkup, mathRegex) {
     const currentToken = tokens[index];
     const newTokens = [];
 
-    if (currentToken.type !== 'html_block' && currentToken.type !== 'inline') {
+    if (currentToken.type !== 'html_block') {
       continue;
     }
 

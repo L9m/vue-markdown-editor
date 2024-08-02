@@ -3,7 +3,6 @@
 /**
  * Test if potential opening or closing delimiter
  */
-const workerPath = require.resolve('./katex.worker.js');
 function isValidInlineDelim(state, pos) {
   const prevChar = state.src[pos - 1];
   const char = state.src[pos];
@@ -748,7 +747,7 @@ export default function (md, options) {
 
   const renderToString = (function () {
     if (window.Worker && options.useWebWorker) {
-      const katexWorker = new Worker(workerPath);
+      const katexWorker = new Worker('./katex.worker.js');
       const messageQuene = [];
       let isProcess = false
 

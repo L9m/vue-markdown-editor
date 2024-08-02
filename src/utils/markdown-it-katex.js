@@ -4,6 +4,8 @@
  * Test if potential opening or closing delimiter
  */
 
+import KatexWorker from "./katex.worker.js";
+
 function isValidInlineDelim(state, pos) {
   const prevChar = state.src[pos - 1];
   const char = state.src[pos];
@@ -747,12 +749,10 @@ export default function (md, options) {
   }
 
   const renderToString = (function () {
-    if (window.Worker && options.useWebWorker) {  
-      const katexWorker = new Worker(require.resolve("./katex-worker.js"));
+    if (window.Worker && options.useWebWorker) {
+      const katexWorker = new KatexWorker()
       const messageQuene = [];
       let isProcess = false
-
-      // const cacheMap = new Map();
 
       function processMessageQueue(message) {
         if (isProcess) {
@@ -775,7 +775,6 @@ export default function (md, options) {
             } else {
               isProcess = false
             }
-            // cacheMap.set(data.tex, data.result)
           } else if (data.error) {
             throw new Error(data.error, null);
           }

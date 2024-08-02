@@ -58,6 +58,10 @@ module.exports = function getBaseConfig(config = {}) {
             name: 'fonts/[name].[hash:7].[ext]',
           },
         },
+        {
+          test: /\.worker\.js$/,
+          use: { loader: "worker-loader" },
+        },
       ],
     },
     plugins: [new VueLoaderPlugin()],

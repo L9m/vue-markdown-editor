@@ -72,15 +72,17 @@ VueMarkdownEditor.use(vuepressTheme, {
 
 VueMarkdownEditor.use(createEmojiPlugin())
   .use(createKatexPlugin({
-    useWebWorker: true,
-    throwOnError: true,
+    enableMathBlockInHtml: true,
+    enableMathInlineInHtml: true,
+    strict: false,
+    useWebWorker: true
   }))
   .use(createTodoListPlugin())
   .use(createLineNumberPlugin())
   .use(createCopyCodePlugin())
   .use(createHighLinesPlugin())
   .use(createMermaidPlugin())
-  .use(createIncrementalDomPlugin());
+  // .use(createIncrementalDomPlugin());
 
 VueMarkdownEditor.Codemirror = Codemirror;
 

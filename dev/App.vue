@@ -59,7 +59,7 @@ export default {
 
       async function* processChunk() {
         while (start < text.length) {
-          await new Promise((resolve) => setTimeout(resolve, 50));
+          await new Promise((resolve) => setTimeout(resolve, 10));
           this.text += text.substring(start, (start += size));
           yield start;
         }

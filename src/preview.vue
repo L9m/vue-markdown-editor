@@ -74,7 +74,9 @@ const component = {
             );
           });
         } else {
+          console.time('parse');
           this.html = xss.process(this.$options.vMdParser.parse(text));
+          console.timeEnd('parse');
         }
 
         this.$emit('change', text, this.html);

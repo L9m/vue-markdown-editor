@@ -6,7 +6,6 @@ export default function (katex) {
       if (mdParser && katex) {
         mdParser.use(markdownItKatex, {
           ...options,
-          katex,
         });
       }
     };

@@ -734,10 +734,95 @@ export default function (md, options) {
   // #endregion
 
   // #region Rendering
+
+  function randomId(length = 6) {
+    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+    let result = '';
+    for (let i = 0; i < length; i++) {
+        result += letters.charAt(Math.floor(Math.random() * letters.length));
+    }
+    return result;
+  }
+
+  const renderToString = (function () {
+    if (window.Worker && options.useWebWorker) {
+      const KatexWorker = `
+        importScripts('https://frontend-cdn.qimingdaren.com/cdn/jquery/katex-v2/katex/katex.min.js');
+
+        const cacheMap = new Map();
+
+        self.onmessage = function(event) {
+          try {
+            const {id, tex, options} = event.data;
+            let result = '';
+            if (cacheMap.has(tex)) {
+              result = cacheMap.get(tex)
+            } else {
+              result = katex.renderToString(tex, options);
+              cacheMap.set(tex, result)
+            }
+            self.postMessage({ id, tex, result });
+          } catch (error) {
+            self.postMessage({ id: event.data.id, tex, error: error.toString() });
+          }
+          }
+
+        self.onerror = function(e) {
+            console.log('Worker: Error received from main script');
+        }
+        `;
+
+      const blob = new Blob([KatexWorker], { type: 'application/javascript' });
+      const katexWorker = new Worker(URL.createObjectURL(blob));
+      const messageQuene = [];
+      let isProcess = false
+
+      function processMessageQueue(message) {
+        if (isProcess) {
+          messageQuene.push(message);
+        } else {
+          isProcess = true
+          katexWorker.postMessage(message);
+        }
+      }
+
+      katexWorker.onmessage = function (event) {
+        const data = event.data;
+          if (data.result) {
+            const placeholderEle = document.querySelector(`#katex-${data.id}`);
+            if (placeholderEle) {
+              placeholderEle.outerHTML = data.result
+            }
+            if (messageQuene.length > 0) {
+              katexWorker.postMessage(messageQuene.shift());
+            } else {
+              isProcess = false
+            }
+          } else if (data.error) {
+            throw new Error(data.error, null);
+          }
+      };
+
+      return function (tex, options, ) {
+
+        // if (cacheMap.has(tex)) {
+        //   return cacheMap.get(tex)
+        // }
+
+        let id = randomId()
+        processMessageQueue({id, tex, options})
+        return `<span id="katex-${id}" style="display: none"></span>`
+      }
+    } else {
+      return katex.renderToString
+    }
+  })()
+
+
   const katexInline = (latex) => {
     const displayMode = /\\begin\{(align|equation|gather|cd|alignat)\}/gi.test(latex);
     try {
-      return katex.renderToString(latex, { ...options, displayMode });
+      return renderToString(latex, { ...options, displayMode });
     } catch (error) {
       if (options.throwOnError) {
         console.log(error);
@@ -754,7 +839,7 @@ export default function (md, options) {
 
   const katexBlockRenderer = (latex) => {
     try {
-      return `<p class="katex-block">${katex.renderToString(latex, {
+      return `<p class="katex-block">${renderToString(latex, {
         ...options,
         displayMode: true,
       })}</p>`;

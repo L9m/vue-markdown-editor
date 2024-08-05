@@ -1,4 +1,5 @@
 /* eslint-disable */
+import KatexWorker from './katex.worker.js';
 
 /**
  * Test if potential opening or closing delimiter
@@ -746,10 +747,8 @@ export default function (md, options) {
   }
 
   const renderToString = (function () {
-    console.log('renderToString')
     if (window.Worker && options.useWebWorker) {
-      console.log('useWebWorker')
-      const katexWorker = new Worker('./katex.worker.js');
+      const katexWorker = new KatexWorker()
       const messageQuene = [];
       let isProcess = false
 

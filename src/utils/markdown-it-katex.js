@@ -281,7 +281,6 @@ function blockBareMath(state, start, end, silent) {
   ).trim();
   token.map = [start, state.line];
   token.markup = '$$';
-  console.log(token)
   return true;
 }
 

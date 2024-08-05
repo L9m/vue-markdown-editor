@@ -1,5 +1,4 @@
 /* eslint-disable */
-import KatexWorker from './katex.worker.js?worker';
 
 /**
  * Test if potential opening or closing delimiter
@@ -748,7 +747,34 @@ export default function (md, options) {
 
   const renderToString = (function () {
     if (window.Worker && options.useWebWorker) {
-      const katexWorker = new KatexWorker()
+      const KatexWorker = `
+        importScripts('https://frontend-cdn.qimingdaren.com/cdn/jquery/katex-v2/katex/katex.min.js');
+
+        const cacheMap = new Map();
+
+        self.onmessage = function(event) {
+          try {
+            const {id, tex, options} = event.data;
+            let result = '';
+            if (cacheMap.has(tex)) {
+              result = cacheMap.get(tex)
+            } else {
+              result = katex.renderToString(tex, options);
+              cacheMap.set(tex, result)
+            }
+            self.postMessage({ id, tex, result });
+          } catch (error) {
+            self.postMessage({ id: event.data.id, tex, error: error.toString() });
+          }
+          }
+
+        self.onerror = function(e) {
+            console.log('Worker: Error received from main script');
+        }
+        `;
+
+      const blob = new Blob([KatexWorker], { type: 'application/javascript' });
+      const katexWorker = new Worker(URL.createObjectURL(blob));
       const messageQuene = [];
       let isProcess = false
 

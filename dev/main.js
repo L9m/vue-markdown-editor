@@ -19,7 +19,7 @@ import '@/plugins/highlight-lines/highlight-lines';
 import createMermaidPlugin from '@/plugins/mermaid/cdn';
 
 import createCreateCopyCodePreview from '@/plugins/copy-code/preview';
-import createIncrementalDomPlugin from '@/plugins/incremental-dom/npm';
+import createDiffDOMPlugin from '@/plugins/diff-dom/npm';
 
 import vuepressTheme from '@/theme/vuepress';
 import enUS from '@/lang/en-US';
@@ -82,7 +82,7 @@ VueMarkdownEditor.use(createEmojiPlugin())
   .use(createCopyCodePlugin())
   .use(createHighLinesPlugin())
   .use(createMermaidPlugin())
-  // .use(createIncrementalDomPlugin());
+  .use(createDiffDOMPlugin());
 
 VueMarkdownEditor.Codemirror = Codemirror;
 

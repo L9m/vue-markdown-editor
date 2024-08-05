@@ -66,12 +66,13 @@ const component = {
   methods: {
     handleTextChange() {
       const next = (text) => {
-        if (this.vMdParser.themeConfig.markdownParser && this.vMdParser.themeConfig.markdownParser.IncrementalDOM && this.vMdParser.themeConfig.markdownParser.IncrementalDOMRenderer) {
+        if (this.vMdParser.themeConfig.markdownParser.diffDOM) {
           this.$nextTick(() => {
-            this.vMdParser.themeConfig.markdownParser.IncrementalDOM.patch(
-              this.$refs.preview,
-              this.vMdParser.themeConfig.markdownParser.renderToIncrementalDOM(this.text)
-            );
+            const newElement = document.createElement('div');
+            newElement.classList = [this.previewClass]
+            newElement.innerHTML = xss.process(this.$options.vMdParser.parse(text))
+            const diff = this.vMdParser.themeConfig.markdownParser.diffDOM.diff(this.$refs.preview, newElement)
+            this.vMdParser.themeConfig.markdownParser.diffDOM.apply(this.$refs.preview, diff)
           });
         } else {
           this.html = xss.process(this.$options.vMdParser.parse(text));

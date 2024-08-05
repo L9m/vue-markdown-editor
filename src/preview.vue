@@ -71,9 +71,7 @@ const component = {
             const newElement = document.createElement('div');
             newElement.classList = [this.previewClass]
             newElement.innerHTML = xss.process(this.$options.vMdParser.parse(text))
-            console.log(newElement.innerHTML, this.$refs.preview.innerHTML)
             const diff = this.vMdParser.themeConfig.markdownParser.diffDOM.diff(this.$refs.preview, newElement)
-            console.log(diff)
             this.vMdParser.themeConfig.markdownParser.diffDOM.apply(this.$refs.preview, diff)
           });
         } else {

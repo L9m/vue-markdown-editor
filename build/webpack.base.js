@@ -60,7 +60,7 @@ module.exports = function getBaseConfig(config = {}) {
         },
         {
           test: /\.worker\.js$/,
-          use: { loader: "worker-loader", options: { inline: true, publicPath: "../workers/" } },
+          use: { loader: "worker-loader", options: { inline: true, fallback: false } },
         },
       ],
     },

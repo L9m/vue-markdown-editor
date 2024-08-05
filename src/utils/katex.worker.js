@@ -1,5 +1,5 @@
 /* eslint-disable */
-importScripts('//frontend-cdn.qimingdaren.com/cdn/jquery/katex-v2/katex/katex.min.js');
+importScripts('https://frontend-cdn.qimingdaren.com/cdn/jquery/katex-v2/katex/katex.min.js');
 
 const cacheMap = new Map();
 

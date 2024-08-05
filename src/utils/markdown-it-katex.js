@@ -1,5 +1,5 @@
 /* eslint-disable */
-import KatexWorker from '!worker-loader./katex.worker.js?worker';
+import KatexWorker from './katex.worker.js?worker';
 
 /**
  * Test if potential opening or closing delimiter

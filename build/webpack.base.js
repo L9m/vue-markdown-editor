@@ -60,7 +60,7 @@ module.exports = function getBaseConfig(config = {}) {
         },
         {
           test: /\.worker\.js$/,
-          use: { loader: "worker-loader", options: { inline: 'no-fallback' } },
+          use: { loader: "worker-loader", options: { inline: "fallback"  } },
         },
       ],
     },

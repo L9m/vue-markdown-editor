@@ -795,7 +795,7 @@ export default function (md, options) {
               placeholderEle.outerHTML = data.result
             }
             if (messageQuene.length > 0) {
-              katexWorker.postMessage(messageQuene.shift());
+              katexWorker.postMessage(messageQuene.pop());
             } else {
               isProcess = false
             }

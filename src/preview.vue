@@ -16,6 +16,26 @@ import xss from '@/utils/xss/index';
 import PreviewMixin from '@/mixins/preview';
 import langMixins from '@/mixins/lang';
 
+function debounce (func, threshold, immediate) {
+  let timeout;
+  return function debounced(...args) {
+    const obj = this;
+    function delayed () {
+      if (!immediate) {
+        func.apply(obj, args);
+      }
+      timeout = null;
+    }
+
+    if (timeout) {
+      clearTimeout(timeout);
+    } else if (immediate) {
+      func.apply(obj, args);
+    }
+    timeout = setTimeout(delayed, threshold || 100);
+  };
+}
+
 const defaultMarkdownLoader = (text) => text;
 
 const component = {
@@ -46,10 +66,10 @@ const component = {
   },
   watch: {
     text() {
-      this.handleTextChange();
+      this.debouncedHandleTextChange();
     },
     langConfig() {
-      this.handleTextChange();
+      this.debouncedHandleTextChange();
     },
   },
   created() {
@@ -85,6 +105,10 @@ const component = {
       }
       this.$emit('change', this.text, this.html);
     },
+
+    debouncedHandleTextChange: debounce(function () {
+      this.handleTextChange();
+    }, 300),
   },
 };
 

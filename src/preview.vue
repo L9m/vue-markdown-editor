@@ -54,10 +54,6 @@ const component = {
     },
     theme: Object,
     beforeChange: Function,
-    debounceTime: {
-      type: Number,
-      default: 100
-    }
   },
   emits: ['change'],
   data() {
@@ -113,7 +109,7 @@ const component = {
     },
     debouncedHandleTextChange: debounce(function () {
       this.handleTextChange();
-    }, this.debounceTime),
+    }, 100),
   },
 };
 

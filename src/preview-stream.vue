@@ -19,7 +19,7 @@ import langMixins from '@/mixins/lang';
 const defaultMarkdownLoader = (text) => text;
 
 const component = {
-  name: 'v-md-preview',
+  name: 'v-md-preview-stream',
   mixins: [langMixins, PreviewMixin],
   props: {
     text: {

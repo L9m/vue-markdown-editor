@@ -1,4 +1,4 @@
 import creator from './creator';
-import * as IncrementalDOM from 'incremental-dom';
+import { DiffDOM } from 'diff-dom';
 
-export default creator(IncrementalDOM);
+export default creator(DiffDOM);

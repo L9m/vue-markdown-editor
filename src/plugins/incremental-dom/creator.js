@@ -1,16 +1,12 @@
-import markdownItIncrementalDom from '@/utils/markdown-it-incremental-dom';
+import markdownItDiffDom from '@/utils/markdown-it-diff-dom';
 
-export default function (IncrementalDOM) {
+export default function (DiffDOM) {
   return function createIncrementalDomPlugin(options) {
     const extendMarkdown = function (mdParser) {
-      if (mdParser) {
-        mdParser.use(markdownItIncrementalDom, IncrementalDOM, {
+      if (DiffDOM) {
+        mdParser.use(markdownItDiffDom, DiffDOM, {
           ...options,
         });
-      }
-
-      if (!mdParser.IncrementalDOM) {
-        mdParser.IncrementalDOM = IncrementalDOM;
       }
     };
 

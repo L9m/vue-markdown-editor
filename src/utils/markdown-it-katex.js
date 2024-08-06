@@ -686,6 +686,7 @@ export default function (md, options) {
   const enableMathInlineInHtml = options.enableMathInlineInHtml;
   const enableFencedBlocks = options.enableFencedBlocks;
   const displayError = options.displayError;
+  const useSyncCache = options.useSyncCache;
 
   // #region Parsing
   md.inline.ruler.after('escape', 'math_inline', inlineMath);
@@ -775,6 +776,7 @@ export default function (md, options) {
       const blob = new Blob([KatexWorker], { type: 'application/javascript' });
       const katexWorker = new Worker(URL.createObjectURL(blob));
       const messageQuene = [];
+      const cacheMap = Object.create(null);
       let isProcess = false
 
       function processMessageQueue(message) {
@@ -798,16 +800,21 @@ export default function (md, options) {
             } else {
               isProcess = false
             }
+            if (useSyncCache) {
+              cacheMap[data.tex] = data.result
+            }
           } else if (data.error) {
             throw new Error(data.error, null);
           }
       };
 
       return function (tex, options, ) {
-
-        // if (cacheMap.has(tex)) {
-        //   return cacheMap.get(tex)
-        // }
+        if (useSyncCache) {
+          const cache = cacheMap[tex]
+          if (cache) {
+            return cache
+          }
+        }
 
         let id = randomId()
         processMessageQueue({id, tex, options})

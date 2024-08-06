@@ -1,8 +1,8 @@
 import creator from './creator';
 
 const isServer = typeof window === 'undefined';
-if (!isServer && !window.IncrementalDOM) {
-  console.error('Please import resources katex from cdn');
+if (!isServer && !window.diffDOM) {
+  console.error('Please import resources diffDOM from cdn');
 }
 
-export default creator(!isServer && window.IncrementalDOM);
+export default creator(!isServer && window.diffDOM);

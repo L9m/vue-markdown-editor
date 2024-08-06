@@ -55,6 +55,7 @@
         <v-md-preview
           :text="text"
           :tab-size="tabSize"
+          :debounce="debounce"
           :scroll-container="getPreviewScrollContainer"
           :before-change="beforePreviewChange"
           @change="handleChange"
@@ -78,6 +79,12 @@ import createEditor from './create-editor';
 import { inBrowser } from '@/utils/util';
 
 const component = {
+  props: {
+    debounce: {
+      type: Number,
+      default: 0,
+    },
+  },
   components: {
     [TextareaEditor.name]: TextareaEditor,
   },

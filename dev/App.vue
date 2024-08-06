@@ -6,6 +6,7 @@
       v-model="text"
       height="500px"
       autofocus
+      :debounce="500"
       :disabled-menus="[]"
       toc-nav-position-right
       @upload-image="handleUploadImage"

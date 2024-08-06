@@ -21,23 +21,23 @@ import { reactive } from 'vue';
 import xss from '@/utils/xss/index';
 import { VMdParser } from '@/utils/v-md-parser';
 
-function debounce (func, threshold, immediate) {
- let timeout;
- return function debounced() {
-  let obj = this, args = arguments;
-     function delayed () {
-         if (!immediate)
-             func.apply(obj, args);
-         timeout = null; 
-     }
+function debounce(func, threshold, immediate) {
+  let timeout;
+  return function debounced() {
+    let obj = this, args = arguments;
+    function delayed() {
+      if (!immediate)
+        func.apply(obj, args);
+      timeout = null;
+    }
 
-     if (timeout)
-         clearTimeout(timeout);
-     else if (immediate)
-         func.apply(obj, args);
+    if (timeout)
+      clearTimeout(timeout);
+    else if (immediate)
+      func.apply(obj, args);
 
-     timeout = setTimeout(delayed, threshold || 100); 
- };
+    timeout = setTimeout(delayed, threshold || 100);
+  };
 
 }
 
@@ -54,6 +54,10 @@ const component = {
     },
     theme: Object,
     beforeChange: Function,
+    debounce: {
+      type: Number,
+      default: 0,
+    },
   },
   emits: ['change'],
   data() {
@@ -66,7 +70,7 @@ const component = {
       this.debouncedHandleTextChange();
     },
     langConfig() {
-      this.debouncedHandleTextChange();
+      this.handleTextChange();
     },
   },
   computed: {
@@ -81,6 +85,14 @@ const component = {
     },
   },
   created() {
+    if (this.debounce) {
+      this.debouncedHandleTextChange = debounce(function () {
+        this.handleTextChange();
+      }, this.debounce);
+    } else {
+      this.debouncedHandleTextChange = this.handleTextChange;
+    }
+
     this.handleTextChange();
   },
   methods: {
@@ -107,9 +119,6 @@ const component = {
         next(this.text);
       }
     },
-    debouncedHandleTextChange: debounce(function () {
-      this.handleTextChange();
-    }, 40),
   },
 };
 

@@ -102,7 +102,6 @@ const component = {
   },
   methods: {
     handleTextChange() {
-      console.log('1');
       if (this.markdownParser.diffDOM) {
         setTimeout(() => {
           const newElement = document.createElement('div');

@@ -1,7 +1,7 @@
 <template>
   <div>
     <button @click="load">加载</button>
-    <v-md-editor v-model="text" height="500px" autofocus toc-nav-position-right :disabled-menus="[]"
+    <v-md-editor v-model="text" height="500px" :debounce="400" autofocus toc-nav-position-right :disabled-menus="[]"
       @upload-image="handleUploadImage" @fullscreen-change="handleFullscreenChange" @save="handleSave"
       @copy-code-success="handleCopyCodeSuccess" @image-click="handleImageClick" ref="editor" />
   </div>

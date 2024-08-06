@@ -36,6 +36,7 @@
       <v-md-preview
         :text="text"
         :tab-size="tabSize"
+        :debounce="debounce"
         :scroll-container="getPreviewScrollContainer"
         @change="handleChange"
         @image-click="handlePreviewImageClick"
@@ -61,6 +62,10 @@ const component = {
     codemirrorStyleReset: {
       type: Boolean,
       default: true,
+    },
+    debounce: {
+      type: Number,
+      default: 0,
     },
   },
   watch: {
@@ -100,7 +105,7 @@ const component = {
       mode: 'markdown',
       lineWrapping: true,
       scrollbarStyle: 'overlay',
-      ...this.codemirrorConfig
+      ...this.codemirrorConfig,
     });
 
     this.codemirrorInstance.on('change', () => {

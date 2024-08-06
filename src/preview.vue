@@ -47,6 +47,10 @@ const component = {
       default: '',
     },
     theme: Object,
+    debounce: {
+      type: Number,
+      default: 0,
+    },
   },
   data() {
     return {
@@ -69,7 +73,7 @@ const component = {
       this.debouncedHandleTextChange();
     },
     langConfig() {
-      this.debouncedHandleTextChange();
+      this.handleTextChange();
     },
   },
   created() {
@@ -88,10 +92,17 @@ const component = {
       });
     }
 
+    if (this.debounce) {
+      this.debouncedHandleTextChange = debounce(this.handleTextChange, this.debounce);
+    } else {
+      this.debouncedHandleTextChange = this.handleTextChange;
+    }
+
     this.handleTextChange();
   },
   methods: {
     handleTextChange() {
+      console.log('1');
       if (this.markdownParser.diffDOM) {
         setTimeout(() => {
           const newElement = document.createElement('div');
@@ -105,10 +116,6 @@ const component = {
       }
       this.$emit('change', this.text, this.html);
     },
-
-    debouncedHandleTextChange: debounce(function () {
-      this.handleTextChange();
-    }, 300),
   },
 };
 

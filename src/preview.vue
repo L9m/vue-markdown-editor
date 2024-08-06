@@ -109,7 +109,7 @@ const component = {
     },
     debouncedHandleTextChange: debounce(function () {
       this.handleTextChange();
-    }, 100),
+    }, 40),
   },
 };
 

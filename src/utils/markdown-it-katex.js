@@ -64,7 +64,7 @@ function inlineMath(state, silent) {
     return false;
   }
 
-  const lastToken = state.tokens.at(-1);
+  // const lastToken = state.tokens.at(-1);
 
   // if (lastToken?.type === 'html_inline') {
   //   // We may be inside of inside of inline html

@@ -6,7 +6,7 @@
       v-model="text"
       height="500px"
       autofocus
-      :debounce="500"
+      :debounce="0"
       :disabled-menus="[]"
       toc-nav-position-right
       @upload-image="handleUploadImage"
@@ -60,7 +60,7 @@ export default {
 
       async function* processChunk() {
         while (start < text.length) {
-          await new Promise((resolve) => setTimeout(resolve, 10));
+          await new Promise((resolve) => setTimeout(resolve, 50));
           this.text += text.substring(start, (start += size));
           yield start;
         }
@@ -73,3 +73,17 @@ export default {
   },
 };
 </script>
+
+
+<style >
+.qm-chat-cursor {
+  background-image: url(https://media.tenor.com/KwKL5awF9aMAAAAj/minecraft-fox.gif);
+  background-size: cover;
+  display: inline-block;
+  height: 16px;
+  margin-left: 4px;
+  position: relative;
+  top: 1px;
+  width: 16px
+}
+</style>

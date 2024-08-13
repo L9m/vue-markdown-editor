@@ -34,6 +34,7 @@
       },
       theme: Object,
       beforeChange: Function,
+      showCursor: Boolean,
     },
     emits: ['change'],
     data() {
@@ -66,6 +67,13 @@
     methods: {
       handleTextChange() {
         const next = (text) => {
+
+          if (this.showCursor) {
+            let tempText = text
+            tempText = tempText.replaceAll('[[qm-private-cursor]]', '')
+            text = tempText + '[[qm-private-cursor]]'
+          }
+
           if (this.vMdParser.themeConfig.markdownParser.diffDOM) {
             setTimeout(() => {
               const newElement = document.createElement('div');

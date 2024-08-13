@@ -58,6 +58,7 @@ const component = {
       type: Number,
       default: 0,
     },
+    showCursor: Boolean,
   },
   emits: ['change'],
   data() {
@@ -98,6 +99,13 @@ const component = {
   methods: {
     handleTextChange() {
       const next = (text) => {
+
+        if (this.showCursor) {
+          let tempText = text
+          tempText = tempText.replaceAll('[[qm-private-cursor]]', '')
+          text = tempText + '[[qm-private-cursor]]'
+        }
+
         if (this.vMdParser.themeConfig.markdownParser.diffDOM) {
           setTimeout(() => {
             const newElement = document.createElement('div');

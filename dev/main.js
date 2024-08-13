@@ -20,6 +20,7 @@ import createMermaidPlugin from '@/plugins/mermaid/cdn';
 
 import createCreateCopyCodePreview from '@/plugins/copy-code/preview';
 import createDiffDOMPlugin from '@/plugins/incremental-dom/npm';
+import createCursorPlugin from '@/plugins/cursor/index';
 
 import vuepressTheme from '@/theme/vuepress';
 import enUS from '@/lang/en-US';
@@ -83,6 +84,7 @@ VueMarkdownEditor.use(createEmojiPlugin())
   .use(createCopyCodePlugin())
   .use(createHighLinesPlugin())
   .use(createMermaidPlugin())
+  .use(createCursorPlugin())
   .use(createDiffDOMPlugin());
 
 VueMarkdownEditor.Codemirror = Codemirror;

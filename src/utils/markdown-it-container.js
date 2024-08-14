@@ -36,10 +36,11 @@ export default function (
       renderAfter = wrapRenderPlaceFunction(after);
     } else {
       // fallback default
-      renderBefore = (info) =>
-        `<div class="${blockClass} ${type}">${
-          info ? `<p class="${blockClass}-title">${info}</p>` : ''
-        }\n`;
+      renderBefore = (info) => {
+        return `<div class="${blockClass} ${type}">${
+          info ? `<p class="${blockClass}-title">${ md.renderInline(info)}</p>` : ''
+        }\n`
+      };
       renderAfter = () => '</div>\n';
     }
 

@@ -764,7 +764,7 @@ export default function (md, options) {
             }
             self.postMessage({ id, tex, result });
           } catch (error) {
-            self.postMessage({ id: event.data.id, tex, error: error.toString() });
+            self.postMessage({ id: event.data.id, error: error.toString() });
           }
           }
 

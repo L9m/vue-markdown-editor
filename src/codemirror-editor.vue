@@ -46,6 +46,7 @@
         <v-md-preview
           :text="text"
           :tab-size="tabSize"
+          :show-cursor="true"
           :debounce="debounce"
           :scroll-container="getPreviewScrollContainer"
           :before-change="beforePreviewChange"

@@ -17,7 +17,8 @@ export default function (md) {
 
     const finalCode = rawCode
       .replace('<!--beforeend-->', `${button}<!--beforeend-->`)
-      .replace('v-md-pre-wrapper', 'v-md-pre-wrapper copy-code-mode');
+      .replace('v-md-pre-wrapper', 'v-md-pre-wrapper copy-code-mode')
+      .replace('[[qm-private-cursor]]', '');
 
     return finalCode;
   };

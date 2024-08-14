@@ -1,7 +1,7 @@
 <template>
   <div>
     <button @click="load">加载</button>
-    <v-md-editor v-model="text" height="500px" :debounce="400" autofocus toc-nav-position-right :disabled-menus="[]"
+    <v-md-editor v-model="text" height="500px" :debounce="0" autofocus toc-nav-position-right :disabled-menus="[]"
       @upload-image="handleUploadImage" @fullscreen-change="handleFullscreenChange" @save="handleSave"
       @copy-code-success="handleCopyCodeSuccess" @image-click="handleImageClick" ref="editor" />
   </div>
@@ -60,3 +60,16 @@ export default {
   },
 };
 </script>
+
+<style >
+.qm-chat-cursor {
+  background-image: url(https://media.tenor.com/KwKL5awF9aMAAAAj/minecraft-fox.gif);
+  background-size: cover;
+  display: inline-block;
+  height: 16px;
+  margin-left: 4px;
+  position: relative;
+  top: 1px;
+  width: 16px
+}
+</style>

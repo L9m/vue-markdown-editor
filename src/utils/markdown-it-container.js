@@ -38,7 +38,7 @@ export default function (
       // fallback default
       renderBefore = (info) =>
         `<div class="${blockClass} ${type}">${
-          info ? `<p class="${blockClass}-title">${info}</p>` : ''
+          info ? `<p class="${blockClass}-title">${md.renderInline(info)}</p>` : ''
         }\n`;
       renderAfter = () => '</div>\n';
     }

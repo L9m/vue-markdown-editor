@@ -1,5 +1,5 @@
 <template>
-  <div class="v-md-editor-preview" :style="{
+  <div class="v-md-editor-preview" :class="[showCursor ? '': 'hide-cursor']" :style="{
     tabSize,
     '-moz-tab-size': tabSize,
     '-o-tab-size': tabSize
@@ -16,11 +16,11 @@ import xss from '@/utils/xss/index';
 import PreviewMixin from '@/mixins/preview';
 import langMixins from '@/mixins/lang';
 
-function debounce (func, threshold, immediate) {
+function debounce(func, threshold, immediate) {
   let timeout;
   return function debounced(...args) {
     const obj = this;
-    function delayed () {
+    function delayed() {
       if (!immediate) {
         func.apply(obj, args);
       }
@@ -51,6 +51,7 @@ const component = {
       type: Number,
       default: 0,
     },
+    showCursor: Boolean,
   },
   data() {
     return {
@@ -102,18 +103,25 @@ const component = {
   },
   methods: {
     handleTextChange() {
+      let { text } = this;
+      if (this.showCursor) {
+        let tempText = text;
+        tempText = tempText.replaceAll(' [[qm-private-cursor]]', '');
+        text = tempText + ' [[qm-private-cursor]]';
+      }
+
       if (this.markdownParser.diffDOM) {
         setTimeout(() => {
           const newElement = document.createElement('div');
           newElement.classList = [this.themeConfig.previewClass];
-          newElement.innerHTML = xss.process(this.markdownLoader(this.text));
+          newElement.innerHTML = xss.process(this.markdownLoader(text));
           const diff = this.markdownParser.diffDOM.diff(this.$refs.preview, newElement);
           this.markdownParser.diffDOM.apply(this.$refs.preview, diff);
         });
       } else {
-        this.html = xss.process(this.markdownLoader(this.text));
+        this.html = xss.process(this.markdownLoader(text));
       }
-      this.$emit('change', this.text, this.html);
+      this.$emit('change', text, this.html);
     },
   },
 };
@@ -129,3 +137,10 @@ component.extendMarkdown = function (extend) {
 
 export default component;
 </script>
+
+
+<style lang="scss">
+.hide-cursor .qm-chat-cursor {
+  display: none !important;
+}
+</style>

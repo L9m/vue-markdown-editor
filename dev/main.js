@@ -40,6 +40,7 @@ import '@/plugins/highlight-lines/highlight-lines';
 import createMermaidPlugin from '@/plugins/mermaid/cdn';
 import createAlignPlugin from '@/plugins/align';
 import createIncrementalDomPlugin from '@/plugins/incremental-dom/npm';
+import CreateCursorPlugin from '@/plugins/cursor';
 
 import vuepressTheme from '@/theme/vuepress';
 import enUS from '@/lang/en-US';
@@ -61,7 +62,8 @@ VueMarkdownEditor.use(createEmojiPlugin())
   .use(createHighLinesPlugin())
   .use(createMermaidPlugin())
   .use(createAlignPlugin())
-  .use(createIncrementalDomPlugin());
+  .use(createIncrementalDomPlugin())
+  .use(CreateCursorPlugin());
 
 // VueMarkdownEditor.use(githubTheme, {
 //   codeHighlightExtensionMap: {

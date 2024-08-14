@@ -1,6 +1,7 @@
 <template>
   <div
     class="v-md-editor-preview"
+    :class="[showCursor ? '': 'hide-cursor']"
     :style="{
       tabSize,
       '-moz-tab-size': tabSize,
@@ -102,8 +103,8 @@ const component = {
 
         if (this.showCursor) {
           let tempText = text
-          tempText = tempText.replaceAll('[[qm-private-cursor]]', '')
-          text = tempText + '[[qm-private-cursor]]'
+          tempText = tempText.replaceAll(' [[qm-private-cursor]]', '')
+          text = tempText + ' [[qm-private-cursor]]'
         }
 
         if (this.vMdParser.themeConfig.markdownParser.diffDOM) {
@@ -136,3 +137,9 @@ component.vMdParser = new VMdParser();
 
 export default component;
 </script>
+
+<style lang="scss">
+.hide-cursor .qm-chat-cursor {
+  display: none !important;
+}
+</style>

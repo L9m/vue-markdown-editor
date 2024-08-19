@@ -76,25 +76,13 @@
           }
 
           if (this.vMdParser.themeConfig.markdownParser.diffDOM) {
-
-            const update = () => {
+            setTimeout(() => {
               const newElement = document.createElement('div');
               newElement.classList = [this.previewClass]
               newElement.innerHTML = xss.process(this.$options.vMdParser.parse(text))
               const diff = this.vMdParser.themeConfig.markdownParser.diffDOM.diff(this.$refs.preview, newElement)
               this.vMdParser.themeConfig.markdownParser.diffDOM.apply(this.$refs.preview, diff)
-            }
-            
-            if (this.$refs.preview) {
-              const newElement = document.createElement('div');
-              newElement.classList = [this.previewClass]
-              newElement.innerHTML = xss.process(this.$options.vMdParser.parse(text))
-              const diff = this.vMdParser.themeConfig.markdownParser.diffDOM.diff(this.$refs.preview, newElement)
-              this.vMdParser.themeConfig.markdownParser.diffDOM.apply(this.$refs.preview, diff)
-            } else {
-              setTimeout(update)
-            }
-             
+            });
           } else {
             this.html = xss.process(this.$options.vMdParser.parse(text));
           }

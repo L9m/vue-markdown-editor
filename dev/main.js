@@ -85,7 +85,7 @@ VueMarkdownEditor.use(createEmojiPlugin())
   .use(createHighLinesPlugin())
   .use(createMermaidPlugin())
   .use(createCursorPlugin())
-  .use(createDiffDOMPlugin());
+  .use(createDiffDOMPlugin())
 
 VueMarkdownEditor.Codemirror = Codemirror;
 

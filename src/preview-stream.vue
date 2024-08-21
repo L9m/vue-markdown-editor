@@ -77,6 +77,7 @@
 
           if (this.vMdParser.themeConfig.markdownParser.diffDOM) {
             setTimeout(() => {
+              if (!this.$refs.preview) return
               const newElement = document.createElement('div');
               newElement.classList = [this.previewClass]
               newElement.innerHTML = xss.process(this.$options.vMdParser.parse(text))

@@ -112,6 +112,7 @@ const component = {
 
       if (this.markdownParser.diffDOM) {
         setTimeout(() => {
+          if (!this.$refs.preview) return;
           const newElement = document.createElement('div');
           newElement.classList = [this.themeConfig.previewClass];
           newElement.innerHTML = xss.process(this.markdownLoader(text));

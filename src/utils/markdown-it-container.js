@@ -36,8 +36,8 @@ export default function (
       renderAfter = wrapRenderPlaceFunction(after);
     } else {
       // fallback default
-      renderBefore = (info) => {
-        return `<div class="${blockClass} ${type}">${
+      renderBefore = (token, info) => {
+        return `<div class="${blockClass} ${type}" data-sign="${token.attrGet('data-sign')}">${
           info ? `<p class="${blockClass}-title">${ md.renderInline(info)}</p>` : ''
         }\n`
       };
@@ -58,7 +58,7 @@ export default function (
       }
 
       if (token.nesting === 1) {
-        return renderBefore(info);
+        return renderBefore(token, info);
       }
 
       return renderAfter(info);

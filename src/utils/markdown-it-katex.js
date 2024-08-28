@@ -862,7 +862,7 @@ export default function (md, options) {
       if (cacheMap.has(key)) {
           result = cacheMap.get(key)
       } else {
-        result = renderToString(latex, { ...options, displayMode });
+        result = renderToString(latex, { ...options, displayMode: true, });
           cacheMap.set(key, result);
       }
 

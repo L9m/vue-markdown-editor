@@ -3,6 +3,7 @@
 /**
  * Test if potential opening or closing delimiter
  */
+
 function isValidInlineDelim(state, pos) {
   const prevChar = state.src[pos - 1];
   const char = state.src[pos];
@@ -687,6 +688,8 @@ export default function (md, options) {
   const enableFencedBlocks = options.enableFencedBlocks;
   const displayError = options.displayError;
   const useSyncCache = options.useSyncCache;
+  const useStreamCache = options.useStreamCache;
+  options.output = 'html';
 
   // #region Parsing
   md.inline.ruler.after('escape', 'math_inline', inlineMath);
@@ -745,6 +748,8 @@ export default function (md, options) {
     return result;
   }
 
+  const cacheMap = new Map();
+
   const renderToString = (function () {
     if (window.Worker && options.useWebWorker) {
       const KatexWorker = `
@@ -776,7 +781,6 @@ export default function (md, options) {
       const blob = new Blob([KatexWorker], { type: 'application/javascript' });
       const katexWorker = new Worker(URL.createObjectURL(blob));
       const messageQuene = [];
-      const cacheMap = Object.create(null);
       let isProcess = false
 
       function processMessageQueue(message) {
@@ -800,21 +804,17 @@ export default function (md, options) {
             } else {
               isProcess = false
             }
-            if (useSyncCache) {
-              cacheMap[data.tex] = data.result
-            }
+
+            cacheMap.set(data.tex, data.result)
           } else if (data.error) {
             throw new Error(data.error, null);
           }
       };
 
       return function (tex, options, ) {
-        if (useSyncCache) {
-          const cache = cacheMap[tex]
-          if (cache) {
-            return cache
+          if (cacheMap.has(tex)) {
+            return cacheMap.get(tex)
           }
-        }
 
         let id = randomId()
         processMessageQueue({id, tex, options})
@@ -829,7 +829,17 @@ export default function (md, options) {
   const katexInline = (latex) => {
     const displayMode = /\\begin\{(align|equation|gather|cd|alignat)\}/gi.test(latex);
     try {
-      return renderToString(latex, { ...options, displayMode });
+
+      const key = `${latex}`;
+      let result = '';
+      if (cacheMap.has(key)) {
+        result =  cacheMap.get(key);
+      } else {
+        result = renderToString(latex, { ...options, displayMode });
+          cacheMap.set(key, result);
+      }
+
+      return result;
     } catch (error) {
       if (options.throwOnError) {
         console.log(error);
@@ -846,10 +856,17 @@ export default function (md, options) {
 
   const katexBlockRenderer = (latex) => {
     try {
-      return `<p class="katex-block">${renderToString(latex, {
-        ...options,
-        displayMode: true,
-      })}</p>`;
+      const key = `${latex}`;
+      let result = '';
+
+      if (cacheMap.has(key)) {
+          result = cacheMap.get(key)
+      } else {
+        result = renderToString(latex, { ...options, displayMode });
+          cacheMap.set(key, result);
+      }
+
+      return `<p class="katex-block">${result}</p>`;
     } catch (error) {
       if (options.throwOnError) {
         console.log(error);

@@ -60,6 +60,14 @@ const component = {
       default: 0,
     },
     showCursor: Boolean,
+    isDiffDom: {
+      type: Boolean,
+      default: true
+    },
+    isXss: {
+      type: Boolean,
+      default: true
+    },
   },
   emits: ['change'],
   data() {
@@ -107,18 +115,18 @@ const component = {
           text = tempText + ' [[qm-private-cursor]]'
         }
 
-        if (this.vMdParser.themeConfig.markdownParser.diffDOM) {
-          setTimeout(() => {
-            if (!this.$refs.preview) return
-            const newElement = document.createElement('div');
-            newElement.classList = [this.previewClass]
-            newElement.innerHTML = xss.process(this.$options.vMdParser.parse(text))
-            const diff = this.vMdParser.themeConfig.markdownParser.diffDOM.diff(this.$refs.preview, newElement)
-            this.vMdParser.themeConfig.markdownParser.diffDOM.apply(this.$refs.preview, diff)
-          });
-        } else {
-          this.html = xss.process(this.$options.vMdParser.parse(text));
-        }
+        if (this.vMdParser.themeConfig.markdownParser.diffDOM && this.isDiffDom) {
+            setTimeout(() => {
+              if (!this.$refs.preview) return
+              const newElement = document.createElement('div');
+              newElement.classList = [this.previewClass]
+              newElement.innerHTML = this.isXss ? xss.process(this.$options.vMdParser.parse(text)) : this.$options.vMdParser.parse(text)
+              const diff = this.vMdParser.themeConfig.markdownParser.diffDOM.diff(this.$refs.preview, newElement)
+              this.vMdParser.themeConfig.markdownParser.diffDOM.apply(this.$refs.preview, diff)
+            });
+          } else {
+            this.html = this.isXss ? xss.process(this.$options.vMdParser.parse(text)) : this.$options.vMdParser.parse(text)
+          }
 
         this.$emit('change', text, this.html);
       };

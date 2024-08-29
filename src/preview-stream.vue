@@ -12,7 +12,6 @@
     <div
       ref="preview"
       :class="[previewClass]"
-      v-html="html"
     />
   </div>
 </template>
@@ -95,7 +94,11 @@
           } else {
             console.log('this.isXss, this.isDiffDom', this.isXss, this.isDiffDom)
             console.time('update1')
-            this.html = this.isXss ? xss.process(this.$options.vMdParser.parse(text)) : this.$options.vMdParser.parse(text)
+            const html = this.isXss ? xss.process(this.$options.vMdParser.parse(text)) : this.$options.vMdParser.parse(text)
+
+            if (this.$refs.preview) {
+              this.$refs.preview.innerHTML = html
+            }
             console.timeEnd('update1')
           }
   

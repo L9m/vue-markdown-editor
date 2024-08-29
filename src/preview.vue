@@ -125,7 +125,9 @@ const component = {
               this.vMdParser.themeConfig.markdownParser.diffDOM.apply(this.$refs.preview, diff)
             });
           } else {
+            console.time('update')
             this.html = this.isXss ? xss.process(this.$options.vMdParser.parse(text)) : this.$options.vMdParser.parse(text)
+            console.timeEnd('update')
           }
 
         this.$emit('change', text, this.html);

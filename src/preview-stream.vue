@@ -93,7 +93,10 @@
               this.vMdParser.themeConfig.markdownParser.diffDOM.apply(this.$refs.preview, diff)
             });
           } else {
+            console.log('this.isXss, this.isDiffDom', this.isXss, this.isDiffDom)
+            console.time('update1')
             this.html = this.isXss ? xss.process(this.$options.vMdParser.parse(text)) : this.$options.vMdParser.parse(text)
+            console.timeEnd('update1')
           }
   
           this.$emit('change', text, this.html);

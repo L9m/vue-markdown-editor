@@ -79,7 +79,7 @@
 
           if (this.showCursor) {
             let tempText = text
-            tempText = tempText.replaceAll(' [[qm-private-cursor]]', '')
+            tempText = tempText.replace(' [[qm-private-cursor]]', '')
             text = tempText + ' [[qm-private-cursor]]'
           }
 

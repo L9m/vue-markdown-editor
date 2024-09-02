@@ -20,3 +20,4 @@ export const syncScroll = 'sync-scroll';
 export const table = 'table';
 export const ul = 'ul';
 export const undo = 'undo';
+export const underline = 'underline';

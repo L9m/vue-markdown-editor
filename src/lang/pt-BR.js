@@ -101,4 +101,8 @@ export default {
     enabled: 'Tela cheia (ESC para sair)',
     disabled: 'Sair de tela cheia',
   },
+  underline: {
+    toolbar: 'Sublinhado',
+    placeholder: 'Sublinhado',
+  },
 };

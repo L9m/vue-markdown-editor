@@ -131,3 +131,23 @@
 .v-md-icon-fullscreen::before {
   content: '\e606';
 }
+
+@font-face {
+  font-family: "v-new-iconfont";
+  src: url('../font/new/iconfont.woff2?t=1725247044799') format('woff2'),
+       url('../font/new/iconfont.woff?t=1725247044799') format('woff'),
+       url('../font/new/iconfont.ttf?t=1725247044799') format('truetype');
+}
+
+
+[class*='v-new-icon-'] {
+  font-size: 16px;
+  font-family: 'v-new-iconfont' !important;
+  font-style: normal !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.v-new-icon-underline::before {
+  content:  "\e7fa";
+}

@@ -6,7 +6,7 @@ export default function (Component) {
       leftToolbar: {
         type: String,
         default:
-          'undo redo clear | h bold italic strikethrough quote | ul ol table hr | link image code | save',
+          'undo redo clear | h bold italic strikethrough quote underline | ul ol table hr | link image code | save',
       },
       rightToolbar: {
         type: String,

@@ -101,4 +101,8 @@ export default {
     enabled: '全螢幕（按ESC還原）',
     disabled: '退出全螢幕',
   },
+  underline: {
+    toolbar: '下劃線',
+    placeholder: '下劃線',
+  },
 };

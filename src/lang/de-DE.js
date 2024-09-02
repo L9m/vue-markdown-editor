@@ -101,4 +101,8 @@ export default {
     enabled: 'Vollbildschirm (ESC zum Verlassen drücken)',
     disabled: 'Vollbildschirm  verlassen',
   },
+  underline: {
+    toolbar: 'Unterstrichen',
+    placeholder: 'Unterstrichen',
+  }
 };

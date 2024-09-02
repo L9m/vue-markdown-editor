@@ -101,4 +101,7 @@ export default {
     enabled: 'Plein écran (Pressez ESC pour quitter)',
     disabled: 'Quitter le plein écran',
   },
+  underline:{
+    toolbar: 'Souligné',
+    placeholder: 'Souligné',}
 };

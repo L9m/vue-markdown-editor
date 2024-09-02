@@ -67,7 +67,7 @@ export default {
       }
 
       for await (const pos of processChunk.call(this)) {
-        console.log('pos', text[pos]);
+        // console.log('pos', text[pos]);
       }
     },
   },

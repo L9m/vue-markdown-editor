@@ -101,4 +101,8 @@ export default {
     enabled: 'Pełny ekran (Wciśnij ESC, aby opuścić)',
     disabled: 'Opuść tryb pełnoekranowy',
   },
+  underline: {
+    toolbar: 'Podkreślenie',
+    placeholder: 'Podkreślenie',
+  }
 };

@@ -101,4 +101,8 @@ export default {
     enabled: '전체화면 (ESC를 누르면 복원)',
     disabled: '전체화면 나가기',
   },
+  underline:{
+    toolbar: '완성',
+    placeholder: '완성',
+  }
 };

@@ -66,6 +66,14 @@ const component = {
       default: 0,
     },
     showCursor: Boolean,
+    isDiffDom: {
+      type: Boolean,
+      default: true
+    },
+    isXss: {
+      type: Boolean,
+      default: true
+    },
   },
   emits: ['change'],
   data() {
@@ -112,7 +120,7 @@ const component = {
 
         if (this.showCursor) {
           let tempText = text
-          tempText = tempText.replaceAll(' [[qm-private-cursor]]', '')
+          tempText = tempText.replace(' [[qm-private-cursor]]', '')
           text = tempText + ' [[qm-private-cursor]]'
         }
 

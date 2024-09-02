@@ -76,8 +76,9 @@ VueMarkdownEditor.use(createEmojiPlugin())
     enableMathBlockInHtml: true,
     enableMathInlineInHtml: true,
     strict: false,
-    useWebWorker: true,
+    // useWebWorker: true,
     useSyncCache: true,
+    useStreamCache: true
   }))
   .use(createTodoListPlugin())
   .use(createLineNumberPlugin())
@@ -85,7 +86,7 @@ VueMarkdownEditor.use(createEmojiPlugin())
   .use(createHighLinesPlugin())
   .use(createMermaidPlugin())
   .use(createCursorPlugin())
-  .use(createDiffDOMPlugin())
+  // .use(createDiffDOMPlugin())
 
 VueMarkdownEditor.Codemirror = Codemirror;
 

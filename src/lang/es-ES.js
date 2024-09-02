@@ -101,4 +101,8 @@ export default {
     enabled: 'Pantalla completa(Press ESC para salir)',
     disabled: 'Salir de pantalla completa',
   },
+  underline: {
+    toolbar: 'Subrayado',
+    placeholder: 'Subrayado',
+  },
 };

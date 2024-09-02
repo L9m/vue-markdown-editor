@@ -101,4 +101,8 @@ export default {
     enabled: 'Full screen(Press ESC to exit)',
     disabled: 'Exit Full Screen',
   },
+  underline: {
+    toolbar: 'underline',
+    placeholder: 'underline',
+  },
 };

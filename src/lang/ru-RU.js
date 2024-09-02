@@ -101,4 +101,8 @@ export default {
     enabled: 'Полный экран (Нажмите ESC для выхода)',
     disabled: 'Выйти из полноэкранного режима',
   },
+  underline: {
+    toolbar: 'Подчеркнутый',
+    placeholder: 'Подчеркнутый',
+  }
 };

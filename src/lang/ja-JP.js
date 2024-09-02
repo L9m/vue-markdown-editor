@@ -101,4 +101,8 @@ export default {
     enabled: 'フルスクリーンモード（ESCキーで終了）',
     disabled: 'フルスクリーンを終了',
   },
+  underline:{
+    toolbar: '下線',
+    placeholder: '下線',
+  }
 };

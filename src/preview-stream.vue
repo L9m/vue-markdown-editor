@@ -36,6 +36,14 @@
       theme: Object,
       beforeChange: Function,
       showCursor: Boolean,
+      isDiffDom: {
+        type: Boolean,
+        default: true
+      },
+      isXss: {
+        type: Boolean,
+        default: true
+      },
     },
     emits: ['change'],
     data() {
@@ -71,20 +79,21 @@
 
           if (this.showCursor) {
             let tempText = text
-            tempText = tempText.replaceAll(' [[qm-private-cursor]]', '')
+            tempText = tempText.replace(' [[qm-private-cursor]]', '')
             text = tempText + ' [[qm-private-cursor]]'
           }
 
-          if (this.vMdParser.themeConfig.markdownParser.diffDOM) {
+          if (this.vMdParser.themeConfig.markdownParser.diffDOM && this.isDiffDom) {
             setTimeout(() => {
+              if (!this.$refs.preview) return
               const newElement = document.createElement('div');
               newElement.classList = [this.previewClass]
-              newElement.innerHTML = xss.process(this.$options.vMdParser.parse(text))
+              newElement.innerHTML = this.isXss ? xss.process(this.$options.vMdParser.parse(text)) : this.$options.vMdParser.parse(text)
               const diff = this.vMdParser.themeConfig.markdownParser.diffDOM.diff(this.$refs.preview, newElement)
               this.vMdParser.themeConfig.markdownParser.diffDOM.apply(this.$refs.preview, diff)
             });
           } else {
-            this.html = xss.process(this.$options.vMdParser.parse(text));
+            this.html = this.isXss ? xss.process(this.$options.vMdParser.parse(text)) : this.$options.vMdParser.parse(text)
           }
   
           this.$emit('change', text, this.html);

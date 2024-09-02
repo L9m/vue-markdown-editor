@@ -753,7 +753,7 @@ export default function (md, options) {
   const renderToString = (function () {
     if (window.Worker && options.useWebWorker) {
       const KatexWorker = `
-        importScripts('https://frontend-cdn.qimingdaren.com/cdn/jquery/katex-v2/katex/katex.min.js');
+        importScripts('https://frontend-cdn.qimingdaren.com/cdn/jquery/katex-v3/katex.min.js');
 
         const cacheMap = new Map();
 

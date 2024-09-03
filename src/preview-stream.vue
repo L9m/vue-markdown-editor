@@ -12,7 +12,7 @@
     <div
       ref="preview"
       :class="[previewClass]"
-      v-html="html"
+      v-html="vMdParser.themeConfig.markdownParser.diffDOM && isDiffDom ? '' : html"
     />
   </div>
 </template>
@@ -83,20 +83,24 @@
             text = tempText + ' [[qm-private-cursor]]'
           }
 
+          let html = ''
           if (this.vMdParser.themeConfig.markdownParser.diffDOM && this.isDiffDom) {
             setTimeout(() => {
               if (!this.$refs.preview) return
               const newElement = document.createElement('div');
               newElement.classList = [this.previewClass]
-              newElement.innerHTML = this.isXss ? xss.process(this.$options.vMdParser.parse(text)) : this.$options.vMdParser.parse(text)
+              html = this.isXss ? xss.process(this.$options.vMdParser.parse(text)) : this.$options.vMdParser.parse(text)
+              newElement.innerHTML = html
               const diff = this.vMdParser.themeConfig.markdownParser.diffDOM.diff(this.$refs.preview, newElement)
               this.vMdParser.themeConfig.markdownParser.diffDOM.apply(this.$refs.preview, diff)
+              this.html = html
+              this.$emit('change', text, this.html);
             });
           } else {
-            this.html = this.isXss ? xss.process(this.$options.vMdParser.parse(text)) : this.$options.vMdParser.parse(text)
+            html =this.isXss ? xss.process(this.$options.vMdParser.parse(text)) : this.$options.vMdParser.parse(text)
+            this.html = html
+            this.$emit('change', text, this.html);
           }
-  
-          this.$emit('change', text, this.html);
         };
   
         if (this.beforeChange) {

@@ -12,14 +12,13 @@
     <div
       ref="preview"
       :class="[previewClass, 'qmdr-previewer']"
-      v-html="html"
     />
   </div>
 </template>
 
 <script>
 import { reactive } from 'vue';
-// import xss from '@/utils/xss/index';
+import xss from '@/utils/xss/index';
 import { VMdParser } from '@/utils/v-md-parser';
 import vDH from 'virtual-dom/h';
 import vDDiff from 'virtual-dom/diff';
@@ -127,10 +126,13 @@ const component = {
         Logger.time('handleTextChange')
         let html = this.$options.vMdParser.parse(text)
         Logger.time('xss')
-        // html = DOMPurify.sanitize(html)
+        html = xss.process(html)
         Logger.timeEnd('xss')
+        console.log(html)
         this.update(html);
         Logger.timeEnd('handleTextChange')
+
+        this.html = html
 
         this.$emit('change', text, html);
       };

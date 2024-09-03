@@ -31,10 +31,12 @@ export default function (md) {
           let count = token.nesting;
           let startIndex = idx;
           let endIndex = startIndex;
+          let content = '';
 
           while (count !== 0 && endIndex < tokens.length -1) {
             endIndex++;
             const nextToken = tokens[endIndex];
+            content += nextToken.content;
             const nextTokenType = nextToken.type;
             if (nextToken.nesting === -1 && closeTag === nextTokenType) {
                 count--;
@@ -46,7 +48,7 @@ export default function (md) {
 
           // content 取值还有问题，这里拼接字符串是要保证内容的没变化
           // sign 缓存需要考虑 content 相同，就是匹配文本相同
-          content = tokens.slice(startIndex + 1, endIndex).reduce((acc, token) => acc + token.content + JSON.stringify(token.attrs) , '');
+          content += `_${typeName}`;
 
           if (signCacheMap.has(content)) {
             sign = signCacheMap.get(content);
@@ -55,7 +57,8 @@ export default function (md) {
             signCacheMap.set(content, sign);
           }
         // self close tag
-        } else if (token.nesting === -1) {
+        } else if (token.nesting === 0) {
+          content += `_${token.type}`;
           sign = md5(String(content));
         }
 

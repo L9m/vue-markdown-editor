@@ -1,11 +1,12 @@
 export default function (md, { className = 'v-md-mermaid' } = {}) {
+  const signMarkup = 'data-sign';
   const wrap = (wrapped) => (...args) => {
     const [tokens, idx] = args;
     const token = tokens[idx];
     const rawCode = wrapped(...args);
 
     if (token.info === 'mermaid') {
-      return `<pre class="${className}">${token.content
+      return `<pre class="${className}" ${signMarkup}="${token.attrGet(signMarkup)}">${token.content
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')}</pre>`;
     }

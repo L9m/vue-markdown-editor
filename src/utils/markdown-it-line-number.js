@@ -1,4 +1,5 @@
 export default function (md, { lineMarkup = 'data-line' } = {}) {
+  const signMarkup = 'data-sign';
   const defaultRender = function (tokens, idx, options, env, self) {
     return self.renderToken(tokens, idx, options);
   };
@@ -19,7 +20,7 @@ export default function (md, { lineMarkup = 'data-line' } = {}) {
       const token = tokens[idx];
       const lineNumber = token.map ? token.map[0] + 1 : '';
 
-      return `<div ${lineMarkup}="${lineNumber}">${rawCode}</div>`;
+      return `<div  ${signMarkup}="${token.attrGet(signMarkup)}" ${lineMarkup}="${lineNumber}">${rawCode}</div>`;
     };
   }
 

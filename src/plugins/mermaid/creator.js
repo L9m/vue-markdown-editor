@@ -11,6 +11,7 @@ function getPreviewEl(el) {
 export default function creator(mermaid) {
   async function handleMdChange() {
     if (!inBrowser) return;
+    console.log('11')
 
     await this.$nextTick();
 

@@ -1,6 +1,6 @@
 {
   "name": "@l9m/v-md-editor",
-  "version": "3.2.6-beta.0",
+  "version": "3.2.6-beta.1",
   "description": "A markdown editor built on Vue",
   "main": "lib/base-editor.js",
   "keywords": [
@@ -147,7 +147,7 @@
     "markdown-it": "^12.3.2",
     "markdown-it-attrs": "^4.0.0",
     "markdown-it-container": "^3.0.0",
-    "mermaid": "^10.6.1",
+    "mermaid": "^8.10.1",
     "prismjs": "^1.23.0",
     "resize-observer-polyfill": "^1.5.1",
     "vant": "^3.1.3",

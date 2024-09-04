@@ -4,11 +4,6 @@ export default function (md, { className = 'v-md-mermaid' } = {}) {
     const token = tokens[idx];
     const rawCode = wrapped(...args);
 
-    console.log('token.content', token.content)
-    if ( token.info === 'mermaid' && token.content.endsWith('\n')) {
-      console.log('mermaid', token.content);
-    }
-    
     if (token.info === 'mermaid' && token.content.endsWith('\n')) {
       return `<pre class="${className}">${token.content
         .replace(/</g, '&lt;')

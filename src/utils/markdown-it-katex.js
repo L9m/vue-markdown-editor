@@ -769,7 +769,7 @@ export default function (md, options) {
             }
             self.postMessage({ id, tex, result });
           } catch (error) {
-            self.postMessage({ id: event.data.id, error: error.toString() });
+            self.postMessage({ id: event.data.id, error: error.toString(), result: event.data.tex });
           }
           }
 
@@ -807,7 +807,7 @@ export default function (md, options) {
 
             cacheMap.set(data.tex, data.result)
           } else if (data.error) {
-            throw new Error(data.error, null);
+            // throw new Error(data.error, null);
           }
       };
 

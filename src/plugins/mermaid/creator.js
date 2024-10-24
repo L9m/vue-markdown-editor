@@ -65,7 +65,9 @@ export default function creator(mermaid) {
 
         const mixin = {
           created() {
-            mermaid.initialize(initialize);
+            if (mermaid) {
+              mermaid.initialize(initialize);
+            }
           },
           watch: {
             html: {

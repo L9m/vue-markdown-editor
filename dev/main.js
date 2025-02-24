@@ -77,8 +77,6 @@ VueMarkdownEditor.use(createEmojiPlugin())
     enableMathInlineInHtml: true,
     strict: false,
     useWebWorker: true,
-    useSyncCache: true,
-    useStreamCache: true
   }))
   .use(createTodoListPlugin())
   .use(createLineNumberPlugin())

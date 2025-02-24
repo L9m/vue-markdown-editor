@@ -836,7 +836,6 @@ export default function (md, options) {
         result =  cacheMap.get(key);
       } else {
         result = renderToString(latex, { ...options, displayMode });
-          cacheMap.set(key, result);
       }
 
       return result;
@@ -863,7 +862,6 @@ export default function (md, options) {
           result = cacheMap.get(key)
       } else {
         result = renderToString(latex, { ...options, displayMode: true });
-          cacheMap.set(key, result);
       }
 
       return `<p class="katex-block">${result}</p>`;

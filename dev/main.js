@@ -76,7 +76,7 @@ VueMarkdownEditor.use(createEmojiPlugin())
     enableMathBlockInHtml: true,
     enableMathInlineInHtml: true,
     strict: false,
-    // useWebWorker: true,
+    useWebWorker: true,
     throwOnError: true,
     displayError: true
   }))

@@ -691,6 +691,10 @@ export default function (md, options) {
   const useStreamCache = options.useStreamCache;
   options.output = 'html';
 
+  options.macros = {
+    "\\overparen": "\\overgroup"
+  }
+
   // #region Parsing
   md.inline.ruler.after('escape', 'math_inline', inlineMath);
   md.inline.ruler.after('escape', 'math_inline_block', inlineMathBlock);

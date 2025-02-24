@@ -797,7 +797,7 @@ export default function (md, options) {
           if (data.result) {
             const placeholderEle = document.querySelector(`#katex-${data.id}`);
             if (placeholderEle) {
-              placeholderEle.outerHTML = data.result
+              placeholderEle.outerHTML =  displayError && data.error ? data.error : data.result
             }
             if (messageQuene.length > 0) {
               katexWorker.postMessage(messageQuene.shift());
@@ -806,9 +806,11 @@ export default function (md, options) {
             }
 
             cacheMap.set(data.tex, data.result)
-          } else if (data.error) {
-            // throw new Error(data.error, null);
-          }
+        }
+        
+        if (data.error && options.throwOnError) {
+          console.error(data.error, null);
+        }
       };
 
       return function (tex, options, ) {
@@ -841,7 +843,7 @@ export default function (md, options) {
       return result;
     } catch (error) {
       if (options.throwOnError) {
-        console.log(error);
+        console.error(error)
       }
       return `<span class="katex-error" title="${escapeHtml(latex)}">${
         displayError ? escapeHtml(error + '') : escapeHtml(latex)
@@ -867,7 +869,7 @@ export default function (md, options) {
       return `<p class="katex-block">${result}</p>`;
     } catch (error) {
       if (options.throwOnError) {
-        console.log(error);
+        console.error(error);
       }
       return `<p class="katex-block katex-error" title="${escapeHtml(latex)}">${
         displayError ? escapeHtml(error + '') : escapeHtml(latex)

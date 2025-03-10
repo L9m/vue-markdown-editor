@@ -9,16 +9,18 @@ export default function createPrismTheme({
 } = {}) {
   const baseTheme = createBaseTheme(baseConfig);
 
-  baseTheme.extend((md) => {
-    md.set({
-      highlight: createHighlightRender({
-        codeHighlightExtensionMap,
-        hasLang: (lang) => Prism.languages[lang],
-        codeBlockClass,
-        highlight: (str, lang) => Prism.highlight(str, Prism.languages[lang], lang),
-      }),
+  if (Prism) {
+    baseTheme.extend((md) => {
+      md.set({
+        highlight: createHighlightRender({
+          codeHighlightExtensionMap,
+          hasLang: (lang) => Prism.languages[lang],
+          codeBlockClass,
+          highlight: (str, lang) => Prism.highlight(str, Prism.languages[lang], lang),
+        }),
+      });
     });
-  });
+  }
 
   return {
     previewClass: 'markdown-body',

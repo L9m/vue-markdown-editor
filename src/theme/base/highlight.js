@@ -9,16 +9,18 @@ export default function createHljsTheme({
 } = {}) {
   const baseTheme = createBaseTheme(baseConfig);
 
-  baseTheme.extend((md) => {
-    md.set({
-      highlight: createHighlightRender({
-        codeHighlightExtensionMap,
-        hasLang: (lang) => Hljs.getLanguage(lang),
-        codeBlockClass,
-        highlight: (str, lang) => Hljs.highlight(str, { language: lang }).value,
-      }),
+  if (Hljs) {
+    baseTheme.extend((md) => {
+      md.set({
+        highlight: createHighlightRender({
+          codeHighlightExtensionMap,
+          hasLang: (lang) => Hljs.getLanguage(lang),
+          codeBlockClass,
+          highlight: (str, lang) => Hljs.highlight(str, { language: lang }).value,
+        }),
+      });
     });
-  });
+  }
 
   return {
     previewClass: 'markdown-body',

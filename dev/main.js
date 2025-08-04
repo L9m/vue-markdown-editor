@@ -71,12 +71,14 @@ VueMarkdownEditor.use(vuepressTheme, {
 });
 // Preview.use(githubTheme);
 
+import GMathVue from './components/GMath.vue';
+
 VueMarkdownEditor.use(createEmojiPlugin())
   .use(createKatexPlugin({
     enableMathBlockInHtml: true,
     enableMathInlineInHtml: true,
     strict: false,
-    useWebWorker: true,
+    useWebWorker: false,
     throwOnError: true,
     displayError: true
   }))
@@ -86,7 +88,11 @@ VueMarkdownEditor.use(createEmojiPlugin())
   .use(createHighLinesPlugin())
   .use(createMermaidPlugin())
   .use(createCursorPlugin())
-  .use(createDiffDOMPlugin())
+  .use(createDiffDOMPlugin({
+    components: {
+      'math_block': GMathVue
+    }
+  }))
 
 VueMarkdownEditor.Codemirror = Codemirror;
 

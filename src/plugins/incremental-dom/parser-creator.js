@@ -1,13 +1,11 @@
 import markdownItDiffDom from '@/utils/markdown-it-diff-dom';
 
-export default function parserCreator(DiffDOM) {
+export default function parserCreator() {
   return function parser(vMdParser, options) {
     vMdParser.extendMarkdown((mdParser) => {
-      if (DiffDOM) {
-        mdParser.use(markdownItDiffDom, DiffDOM, {
+        mdParser.use(markdownItDiffDom, {
           ...options,
         });
-      }
     });
   };
 }

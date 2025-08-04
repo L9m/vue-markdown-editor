@@ -12,14 +12,19 @@
     <div
       ref="preview"
       :class="[previewClass]"
-      v-html="vMdParser.themeConfig.markdownParser.diffDOM && isDiffDom ? '' : html"
-    />
+    >
+      <component
+        v-for="vNode in currentVNode"
+        :key="vNode.key"
+        :is="vNode"
+      />
+    </div>
   </div>
 </template>
 
 <script>
 import { reactive } from 'vue';
-import xss from '@/utils/xss/index';
+// import xss from '@/utils/xss/index';
 import { VMdParser } from '@/utils/v-md-parser';
 
 function debounce(func, threshold, immediate) {
@@ -73,6 +78,7 @@ const component = {
   data() {
     return {
       html: '',
+      currentVNode: null
     };
   },
   watch: {
@@ -108,31 +114,16 @@ const component = {
   methods: {
     handleTextChange() {
       const next = (text) => {
-
         if (this.showCursor) {
           let tempText = text
           tempText = tempText.replace(' [[qm-private-cursor]]', '')
           text = tempText + ' [[qm-private-cursor]]'
         }
-
-        let html = ''
-        if (this.vMdParser.themeConfig.markdownParser.diffDOM && this.isDiffDom) {
-            setTimeout(() => {
-              if (!this.$refs.preview) return
-              const newElement = document.createElement('div');
-              newElement.classList = [this.previewClass]
-              html = this.isXss ? xss.process(this.$options.vMdParser.parse(text)) : this.$options.vMdParser.parse(text)
-              newElement.innerHTML = html
-              const diff = this.vMdParser.themeConfig.markdownParser.diffDOM.diff(this.$refs.preview, newElement)
-              this.vMdParser.themeConfig.markdownParser.diffDOM.apply(this.$refs.preview, diff)
-              this.html = html
-              this.$emit('change', text, this.html);
-            });
-          } else {
-            html =this.isXss ? xss.process(this.$options.vMdParser.parse(text)) : this.$options.vMdParser.parse(text)
-            this.html = html
-            this.$emit('change', text, this.html);
-          }
+        const vNode = this.$options.vMdParser.parse(text)
+        console.log(vNode)
+        this.currentVNode = vNode
+        
+        this.$emit('change', text, this.html);
       };
 
       if (this.beforeChange) {

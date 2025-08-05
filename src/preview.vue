@@ -13,10 +13,18 @@
       ref="preview"
       :class="[previewClass]"
     >
-      <component
-        v-for="vNode in currentVNode"
-        :key="vNode.key"
-        :is="vNode"
+      <!-- 使用 VNode 渲染 (diff-dom) -->
+      <template v-if="isDiffDom">
+        <component
+          v-for="vNode in currentVNode"
+          :key="vNode.key"
+          :is="vNode"
+        />
+      </template>
+      <!-- 使用 HTML 渲染 (传统方式) -->
+      <div
+        v-else
+        v-html="html"
       />
     </div>
   </div>
@@ -65,14 +73,6 @@ const component = {
       default: 0,
     },
     showCursor: Boolean,
-    isDiffDom: {
-      type: Boolean,
-      default: true
-    },
-    isXss: {
-      type: Boolean,
-      default: true
-    },
   },
   emits: ['change'],
   data() {
@@ -99,6 +99,16 @@ const component = {
     langConfig() {
       return this.vMdParser.lang.config;
     },
+    // 自动检测是否启用了 diff-dom 插件
+    isDiffDom() {
+      // 检查 markdown 渲染器是否被 diff-dom 插件替换
+      const markdownParser = this.vMdParser?.themeConfig?.markdownParser;
+      if (!markdownParser) return false;
+      
+      // diff-dom 插件会替换 renderer.render 方法的名称
+      const renderFn = markdownParser.renderer?.render;
+      return renderFn && renderFn.name === 'render' && !!markdownParser.renderer.renderAttrs;
+    },
   },
   created() {
     if (this.debounce) {
@@ -119,9 +129,18 @@ const component = {
           tempText = tempText.replace(' [[qm-private-cursor]]', '')
           text = tempText + ' [[qm-private-cursor]]'
         }
-        const vNode = this.$options.vMdParser.parse(text)
-        console.log(vNode)
-        this.currentVNode = vNode
+        
+        if (this.isDiffDom) {
+          // 使用 VNode 渲染 (diff-dom)
+          const vNode = this.$options.vMdParser.parse(text)
+          this.currentVNode = vNode
+          this.html = '' // 清空 HTML
+        } else {
+          // 使用 HTML 渲染 (传统方式)
+          const html = this.$options.vMdParser.parse(text)
+          this.html = html
+          this.currentVNode = null // 清空 VNode
+        }
         
         this.$emit('change', text, this.html);
       };

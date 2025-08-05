@@ -20,8 +20,7 @@
     <!-- <v-md-preview-html
       :html="html"
       preview-class="vuepress-markdown-body"
-    /> -->
-    <g-math text="111" />
+    /> -->它能
   </div>
 </template>
 
@@ -66,7 +65,7 @@ export default {
       let size = 1;
       let start = 0;
 
-      const md = await fetch('./dev/md1.md');
+      const md = await fetch('./dev/md2.md');
       const text = await md.text();
       this.text =text
 

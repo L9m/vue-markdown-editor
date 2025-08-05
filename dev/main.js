@@ -55,28 +55,29 @@ PreviewHtml.use(createCreateCopyCodePreview());
 
 VueMarkdownEditor.lang.use('en-US', enUS);
 
-// VueMarkdownEditor.use(githubTheme, {
-//   codeHighlightExtensionMap: {
-//     vue: 'xml',
-//   },
-// });
-VueMarkdownEditor.use(vuepressTheme, {
-  Prism,
+VueMarkdownEditor.use(githubTheme, {
   codeHighlightExtensionMap: {
-    vue: 'markup',
-  },
-  toc: {
-    includeLevel: [1, 2, 3, 4, 5, 6],
+    vue: 'xml',
   },
 });
+// VueMarkdownEditor.use(vuepressTheme, {
+//   Prism,
+//   codeHighlightExtensionMap: {
+//     vue: 'markup',
+//   },
+//   toc: {
+//     includeLevel: [1, 2, 3, 4, 5, 6],
+//   },
+// });
 // Preview.use(githubTheme);
 
 import GMathVue from './components/GMath.vue';
+import GMermaidVue from './components/GMermaid.vue';
 
 VueMarkdownEditor.use(createEmojiPlugin())
   .use(createKatexPlugin({
-    enableMathBlockInHtml: true,
-    enableMathInlineInHtml: true,
+    enableMathBlockInHtml: false,
+    enableMathInlineInHtml: false,
     strict: false,
     useWebWorker: false,
     throwOnError: true,
@@ -90,8 +91,11 @@ VueMarkdownEditor.use(createEmojiPlugin())
   .use(createCursorPlugin())
   .use(createDiffDOMPlugin({
     components: {
-      'math_block': GMathVue
-    }
+      'math': GMathVue,
+      'mermaid': GMermaidVue
+    },
+    enableMathBlockInHtml: true,
+    enableMathInlineInHtml: true,
   }))
 
 VueMarkdownEditor.Codemirror = Codemirror;

@@ -1,6 +1,11 @@
 import { createVNode, Fragment, Comment, Text } from 'vue'
 import { escapeHtml, unescapeAll } from 'markdown-it/lib/common/utils'
 
+// 数学公式处理正则表达式
+const math_block_within_html_regex = /(?<html_before_math>[\s\S]*?)\$\$(?<math>[\s\S]+?)\$\$(?<html_after_math>(?:(?!\$\$[\s\S]+?\$\$)[\s\S])*)/gm;
+const math_inline_within_html_regex = /(?<html_before_math>[\s\S]*?)\$(?<math>.*?)\$(?<html_after_math>(?:(?!\$.*?\$)[\s\S])*)/gm;
+
+
 export const DOM_ATTR_NAME = {
   SOURCE_LINE_START: 'data-source-line',
   SOURCE_LINE_END: 'data-source-line-end',
@@ -29,8 +34,7 @@ export default function (md, options = {
   components: {}
 }) {
 
-
-  function onLeavepictureinpicture(e) {
+function onLeavepictureinpicture(e) {
   const target = e.target
   if (!target.isConnected) {
     target.pause()
@@ -120,28 +124,93 @@ defaultRules.code_block = function(tokens, idx, _, __, slf) {
     preAttrs,
     [createVNode('code', attrs, [createVNode(Text, {}, token.content)])]
   )
-  }
+}
   
-  if (options.components.math_block) {
-    
-    
-    defaultRules.math_block = function (tokens, idx, opts, _, slf) {
+if (options.components.math) {
+  defaultRules.math_block = function (tokens, idx, options, _, slf) {
+    const token = tokens[idx]
 
-      const token = tokens[idx]
-
-      console.log({
-        ...slf.renderAttrs(token),
-        text: token.content
-      })
-
-      return createVNode(options.components.math_block, {
-        ...slf.renderAttrs(token),
-        text: token.content
-      })
-    
-  }
+    return createVNode(options.components.math, {
+      ...slf.renderAttrs(token),
+      type: 'math_block',
+      isBlock: true,
+      content: token.content,
+      markup: token.markup || '$$'
+    })
   }
 
+  defaultRules.math_inline = function (tokens, idx, options, _, slf) {
+    const token = tokens[idx]
+
+    return createVNode(options.components.math, {
+      ...slf.renderAttrs(token),
+      type: 'math_inline',
+      isBlock: false,
+      content: token.content,
+      markup: token.markup || '$'
+    })
+  }
+
+  defaultRules.math_inline_block = function (tokens, idx, options, _, slf) {
+    const token = tokens[idx]
+
+    return createVNode(options.components.math, {
+      ...slf.renderAttrs(token),
+      type: 'math_inline_block',
+      isBlock: true,
+      content: token.content,
+      markup: token.markup || '$$'
+    })
+  }
+
+  defaultRules.math_inline_bare_block = function (tokens, idx, options, _, slf) {
+    const token = tokens[idx]
+
+    return createVNode(options.components.math, {
+      ...slf.renderAttrs(token),
+      type: 'math_inline_bare_block',
+      isBlock: true,
+      content: token.content,
+      markup: token.markup || '$$'
+    })
+  }
+
+  defaultRules.math_bracket_inline = function (tokens, idx, options, _, slf) {
+    const token = tokens[idx]
+
+    return createVNode(options.components.math, {
+      ...slf.renderAttrs(token),
+      type: 'math_bracket_inline',
+      isBlock: false,
+      content: token.content,
+      markup: token.markup || '\\('
+    })
+  }
+
+  defaultRules.math_bracket_block = function (tokens, idx, options, _, slf) {
+    const token = tokens[idx]
+
+    return createVNode(options.components.math, {
+      ...slf.renderAttrs(token),
+      type: 'math_bracket_block',
+      isBlock: true,
+      content: token.content,
+      markup: token.markup || '\\['
+    })
+  }
+
+  defaultRules.math_bracket_inline_block = function (tokens, idx, options, _, slf) {
+    const token = tokens[idx]
+
+    return createVNode(options.components.math, {
+      ...slf.renderAttrs(token),
+      type: 'math_bracket_inline_block',
+      isBlock: true,
+      content: token.content,
+      markup: token.markup || '\\('
+    })
+  }
+}
 
 defaultRules.fence = function(tokens, idx, options, _, slf) {
   const token = tokens[idx]
@@ -156,6 +225,16 @@ defaultRules.fence = function(tokens, idx, options, _, slf) {
     langAttrs = arr.slice(2).join('')
   }
 
+  // Check if mermaid component is provided and language is mermaid
+  if (options.components && options.components.mermaid && langName === 'mermaid') {
+    return createVNode(options.components.mermaid, {
+      ...slf.renderAttrs(token),
+      content: token.content,
+      language: langName,
+      info: info
+    })
+  }
+
   if (options.highlight) {
     highlighted = options.highlight(token.content, langName, langAttrs) || escapeHtml(token.content)
   } else {
@@ -163,7 +242,7 @@ defaultRules.fence = function(tokens, idx, options, _, slf) {
   }
 
   if (highlighted.indexOf('<pre') === 0) {
-    return highlighted + '\n'
+    return createHtmlVNode(highlighted)
   }
 
   const buildVNode = (attrs) => {
@@ -236,13 +315,12 @@ defaultRules.text = function(tokens, idx) {
   return createVNode(Text, {}, tokens[idx].content)
 }
 
-defaultRules.html_block = function(tokens, idx) {
+defaultRules.html_block = function (tokens, idx) {
   const token = tokens[idx]
   if (token.contentVNode) {
     return token.contentVNode
-  }
-
-  return createHtmlVNode(token.content)
+    }
+  return handleMathInHtml(token.content)
 }
 
 defaultRules.html_inline = function(tokens, idx) {
@@ -251,7 +329,7 @@ defaultRules.html_inline = function(tokens, idx) {
     return token.contentVNode
   }
 
-  return createHtmlVNode(token.content)
+  return handleMathInHtml(token.content)
 }
 
 function createHtmlVNode(html) {
@@ -271,14 +349,112 @@ function createHtmlVNode(html) {
       attrs[attr.name] = attr.value
     }
 
-    attrs.innerHTML = element.innerHTML
+    // 检查是否是数学公式元素
+    if (element.classList.contains('math-block') || element.classList.contains('math-inline')) {
+      const mathContent = element.getAttribute('data-math')
+      if (mathContent) {
+        // 创建数学公式 VNode，这里可以调用已有的数学公式渲染逻辑
+        // 暂时保持原有结构，但标记为数学公式
+        attrs['data-math'] = mathContent
+        attrs.innerHTML = mathContent // 显示原始数学公式
+      }
+    } else {
+      attrs.innerHTML = element.innerHTML
+    }
+    
     attrs.key = element.innerHTML
 
     children.push(createVNode(tagName, attrs, []))
   }
 
   return createVNode(Fragment, {}, children)
+  }
+
+function createHtmlVNode2(html) {
+    // 创建一个特殊的 VNode，直接插入 HTML
+    return createVNode(Fragment, {dangerouslySetInnerHTML: { __html: html }})
+  }
+
+
+  // 处理 HTML 中的数学公式，直接返回 VNode
+  function handleMathInHtml(content) {
+  if (!options || (!options.enableMathBlockInHtml && !options.enableMathInlineInHtml)) {
+    return createHtmlVNode(content)
+    }
+
+    const vnodes = []
+    if (options.enableMathBlockInHtml) {
+      let processedContent = content
+      for (const match of processedContent.matchAll(math_block_within_html_regex)) {
+        if (!match.groups) {
+          continue;
+        }
+
+        const html_before_math = match.groups.html_before_math;
+        const math = match.groups.math;
+        const html_after_math = match.groups.html_after_math;
+
+        // 添加数学公式前的 HTML
+        if (html_before_math) {
+          vnodes.push(createHtmlVNode2(html_before_math))
+        }
+
+        // 添加数学公式 VNode - 使用 math 组件
+        if (math) {
+          console.log(math)
+          vnodes.push(createVNode(options.components.math, {
+            isBlock: true,
+            content: math
+          }))
+        }
+
+        if (html_after_math) {
+          vnodes.push(createHtmlVNode2(html_after_math))
+        }
+      }
+    }
+
+    if (options.enableMathInlineInHtml) {
+      let processedContent = content
+      for (const match of processedContent.matchAll(math_inline_within_html_regex)) {
+        if (!match.groups) {
+          continue;
+        }
+
+        const html_before_math = match.groups.html_before_math;
+        const math = match.groups.math;
+        const html_after_math = match.groups.html_after_math;
+
+        // 添加数学公式前的 HTML
+
+        console.log(html_before_math)
+        if (html_before_math) {
+          vnodes.push(createHtmlVNode2(html_before_math))
+        }
+
+        // 添加数学公式 VNode - 使用 math 组件
+
+        if (math) {
+          vnodes.push(createVNode(options.components.math, {
+            isBlock: false,
+            content: math
+          }))
+        }
+
+             console.log(html_after_math)
+
+        if (html_after_math) {
+          vnodes.push(createHtmlVNode2(html_after_math))
+        }
+      }
+    }
+
+    console.log(vnodes)
+
+
+    return vnodes.length === 1 ? vnodes[0] : createVNode(Fragment, {}, vnodes)
 }
+
 
 function renderToken(tokens, idx) {
   const token = tokens[idx]
@@ -322,19 +498,21 @@ function render(tokens, options, env) {
   return tokens.map((token, i) => {
     processToken(token, env)
     if (token.block) {
-      token.attrSet(DOM_ATTR_NAME.TOKEN_IDX, i.toString())
+      if (token.attrSet) {
+        token.attrSet(DOM_ATTR_NAME.TOKEN_IDX, i.toString())
+      }
     }
 
     const type = token.type
 
     let vnode = null
     let parent = null
-
     if (type === 'inline') {
       vnode = createVNode(Fragment, {}, this.render(token.children || [], options, env))
     } else if (rules[type]) {
       const result = rules[type](tokens, i, options, env, this)
       if (typeof result === 'string') {
+        console.log(result)
         vnode = createHtmlVNode(result)
       } else if (result && result.node && result.parent) {
         parent = result.parent
@@ -342,13 +520,33 @@ function render(tokens, options, env) {
       } else {
         vnode = result
       }
+    } else if (type.startsWith('container_') && (type.endsWith('_open') || type.endsWith('_close'))) {
+      // Handle markdown-it-container tokens that generate HTML
+      const renderer = md.renderer.rules[type]
+      if (renderer) {
+        const htmlResult = renderer(tokens, i, options, env, md.renderer)
+        if (typeof htmlResult === 'string') {
+          vnode = createHtmlVNode(htmlResult)
+        }
+      }
     } else {
       vnode = this.renderToken(tokens, i, options)
     }
 
     let isChild = false
     const parentNode = vNodeParents.length > 0 ? vNodeParents[vNodeParents.length - 1] : null
+    
+    console.log(vnode,parentNode)
     if (vnode && parentNode) {
+      // 调试：当处理数学公式时打印父节点信息
+      if (type.includes('math')) {
+        console.log('Math token type:', type)
+        console.log('Parent node type:', parentNode.type)
+        console.log('Parent node tag:', parentNode.type)
+        console.log('VNode type:', vnode.type)
+        console.log('Stack depth:', vNodeParents.length)
+      }
+      
       if (typeof parentNode.type === 'string' || parentNode.type === Fragment) {
         const children = Array.isArray(parentNode.children) ? parentNode.children : []
         parentNode.children = children.concat([vnode])
@@ -371,8 +569,6 @@ function render(tokens, options, env) {
     return isChild ? null : vnode
   }).filter(node => !!node)
 }
-
-
 
   md.renderer.rules = { ...md.renderer.rules, ...defaultRules }
   md.renderer.render = render

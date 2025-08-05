@@ -1,101 +1,118 @@
 <template>
-  <div>
-    <div
-      v-if="mode === 1"
-      class="mathjax g-mathjax"
-      v-html="text"
-    />
-    <div
-      v-if="text && mode === 2"
-      ref="katexRef"
-      class="mathjax g-mathjax"
-      v-html="text"
-    />
-    <div
-      v-if="mode === 3"
-      class="mathjax g-mathjax"
-      v-html="text"
-    />
-  </div>
+  <component 
+    :is="wrapperTag" 
+    :class="mathClasses"
+    ref="mathRef"
+    v-html="renderedMath"
+  />
 </template>
 
-<script>
-import katex from 'katex/dist/contrib/auto-render';
-import 'katex/dist/katex.min.css';
+<script setup>
+import { ref, computed, watch, nextTick, onMounted } from 'vue'
+import katex from 'katex'
+import 'katex/dist/katex.min.css'
 
-export default {
-  props: {
-    text: {
-      type: String,
-      default: '',
-    },
-    mode: {
-      type: Number,
-      default: 1,
-    },
+const props = defineProps({
+  content: {
+    type: String,
+    default: '',
+    required: true
   },
-  data() {
-    return {
-      katexRef: null,
-    };
+  isBlock: {
+    type: Boolean,
+    default: false
   },
-  watch: {
-    text(newVal) {
-      if (newVal && this.mode === 2) {
-        this.$nextTick(() => {
-          this.katexRender();
-        });
+  markup: {
+    type: String,
+    default: '$'
+  },
+  displayMode: {
+    type: Boolean,
+    default: undefined // 如果未定义，则根据 type 和 isBlock 推断
+  }
+})
+
+const mathRef = ref(null)
+
+// 计算属性：包装元素标签
+const wrapperTag = computed(() => {
+  return props.isBlock ? 'div' : 'span'
+})
+
+// 计算属性：CSS 类名
+const mathClasses = computed(() => {
+  return {
+    'katex-block': props.isBlock,
+    'katex-inline': !props.isBlock,
+    'g-mathjax': true,
+    'mathjax': true
+  }
+})
+
+// 计算属性：渲染的数学公式
+const renderedMath = computed(() => {
+  if (!props.content) {
+    return ''
+  }
+
+  try {
+    return katex.renderToString(props.content, {
+      throwOnError: false,
+      errorColor: '#cc0000',
+      strict: false,
+      macros: {
+        "\\overparen": "\\overgroup"
       }
-    },
-    mode(newVal) {
-      if (newVal === 2 && this.text) {
-        this.$nextTick(() => {
-          this.katexRender();
-        });
-      }
-    },
-  },
-  mounted() {
-    // Initial render if mode is 2 and text is already set
-    if (this.mode === 2 && this.text) {
-      this.$nextTick(() => {
-        this.katexRender();
-      });
-    }
-  },
-  methods: {
-    katexRender() {
-      katex(this.$refs.katexRef, {
-        delimiters: [
-          { left: '$$', right: '$$', display: true },
-          { left: '$', right: '$', display: false },
-          { left: '\\(', right: '\\)', display: false },
-          { left: '\\[', right: '\\]', display: true },
-          { left: '\\begin{equation}', right: '\\end{equation}', display: true },
-          { left: '\\begin{equation*}', right: '\\end{equation*}', display: true },
-        ],
-        strict: false,
-        throwOnError: false,
-        errorCodes: false,
-      });
-    },
-  },
-};
+    })
+  } catch (error) {
+    console.warn('KaTeX render error:', error)
+    return `<span class="katex-error" title="${escapeHtml(props.content)}">${escapeHtml(props.content)}</span>`
+  }
+})
+
+// 辅助函数：HTML 转义
+function escapeHtml(unsafe) {
+  if (typeof unsafe !== 'string') {
+    return unsafe
+  }
+  return unsafe
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;')
+}
+
+// 监听内容变化
+watch(() => props.content, () => {
+  // 内容变化时会自动重新计算 renderedMath
+}, { immediate: true })
 </script>
 
 <style lang="scss" scoped>
 .mathjax {
-  width: 100%;
   word-break: break-word;
   word-wrap: break-word;
   overflow-wrap: anywhere;
   font-size: 15px;
 
+  &.katex-block {
+    width: 100%;
+    display: block;
+    margin: 0.5em 0;
+    text-align: center;
+  }
+
+  &.katex-inline {
+    display: inline;
+  }
+
   :deep() {
     img {
-      max-width: 680rpx; // Note: 'rpx' is not a standard CSS unit and may not work as expected. Consider using 'px', 'em', 'rem', or another valid unit.
+      max-width: 680px;
       display: inline;
     }
+    
     span,
     p,
     div,
@@ -109,6 +126,7 @@ export default {
     link {
       font-family: Microsoft YaHei !important;
     }
+    
     span[wave] {
       text-decoration-style: wavy;
       text-decoration-line: underline;
@@ -118,8 +136,18 @@ export default {
   }
 }
 
-:global(.MJX-TEX) {
+.katex-error {
+  color: #cc0000;
+  border: 1px solid #cc0000;
+  padding: 2px 4px;
+  border-radius: 3px;
+  background-color: #fff5f5;
+}
+</style>
+
+<style>
+.MJX-TEX {
   white-space: normal !important;
-  line-height: 6px;
+  line-height: 1.2;
 }
 </style>

@@ -17,10 +17,6 @@
       @copy-code-success="handleCopyCodeSuccess"
       ref="editor"
     />
-    <!-- <v-md-preview-html
-      :html="html"
-      preview-class="vuepress-markdown-body"
-    /> -->它能
   </div>
 </template>
 

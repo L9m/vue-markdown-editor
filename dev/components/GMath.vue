@@ -1,14 +1,13 @@
 <template>
   <component 
     :is="wrapperTag" 
-    :class="mathClasses"
     ref="mathRef"
     v-html="renderedMath"
   />
 </template>
 
 <script setup>
-import { ref, computed, watch, nextTick, onMounted } from 'vue'
+import { ref, computed, watch} from 'vue'
 import katex from 'katex'
 import 'katex/dist/katex.min.css'
 
@@ -39,15 +38,6 @@ const wrapperTag = computed(() => {
   return props.isBlock ? 'div' : 'span'
 })
 
-// 计算属性：CSS 类名
-const mathClasses = computed(() => {
-  return {
-    'katex-block': props.isBlock,
-    'katex-inline': !props.isBlock,
-    'g-mathjax': true,
-    'mathjax': true
-  }
-})
 
 // 计算属性：渲染的数学公式
 const renderedMath = computed(() => {
@@ -89,65 +79,4 @@ watch(() => props.content, () => {
 }, { immediate: true })
 </script>
 
-<style lang="scss" scoped>
-.mathjax {
-  word-break: break-word;
-  word-wrap: break-word;
-  overflow-wrap: anywhere;
-  font-size: 15px;
 
-  &.katex-block {
-    width: 100%;
-    display: block;
-    margin: 0.5em 0;
-    text-align: center;
-  }
-
-  &.katex-inline {
-    display: inline;
-  }
-
-  :deep() {
-    img {
-      max-width: 680px;
-      display: inline;
-    }
-    
-    span,
-    p,
-    div,
-    b,
-    i,
-    ul,
-    li,
-    ol,
-    strong,
-    em,
-    link {
-      font-family: Microsoft YaHei !important;
-    }
-    
-    span[wave] {
-      text-decoration-style: wavy;
-      text-decoration-line: underline;
-      text-underline-position: auto;
-      white-space: pre-wrap;
-    }
-  }
-}
-
-.katex-error {
-  color: #cc0000;
-  border: 1px solid #cc0000;
-  padding: 2px 4px;
-  border-radius: 3px;
-  background-color: #fff5f5;
-}
-</style>
-
-<style>
-.MJX-TEX {
-  white-space: normal !important;
-  line-height: 1.2;
-}
-</style>

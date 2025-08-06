@@ -121,7 +121,16 @@ export default function (md, config = {
 
   defaultRules.code_inline = function (tokens, idx, _options, _, slf) {
     const token = tokens[idx]
-    return createVNode('code', slf.renderAttrs(token), token.content)
+
+    if (config.components.code) {
+      return createVNode(config.components.code, {
+        ...slf.renderAttrs(token),
+        info: token.info,
+        text: token.content
+      })
+    } else {
+      return createVNode('code', slf.renderAttrs(token), () => token.content)
+    }
   }
 
   defaultRules.code_block = function (tokens, idx, _options, _, slf) {
@@ -134,6 +143,18 @@ export default function (md, config = {
 
     delete attrs[DOM_ATTR_NAME.SOURCE_LINE_START]
     delete attrs[DOM_ATTR_NAME.SOURCE_LINE_END]
+
+    if (config.components.code) {
+      return createVNode(
+        'pre',
+        preAttrs,
+        [createVNode(config.components.code, {
+          ...attrs,
+          info: token.info,
+          text: token.content
+        })]
+      )
+    }
 
     return createVNode(
       'pre',
@@ -185,8 +206,6 @@ export default function (md, config = {
       langName = arr[0]
       langAttrs = arr.slice(2).join('')
     }
-
-    // Check if mermaid component is provided and language is mermaid
     if (config.components && config.components.mermaid && langName === 'mermaid') {
       return createVNode(config.components.mermaid, {
         ...slf.renderAttrs(token),
@@ -216,6 +235,15 @@ export default function (md, config = {
 
       delete attrs[DOM_ATTR_NAME.SOURCE_LINE_START]
       delete attrs[DOM_ATTR_NAME.SOURCE_LINE_END]
+
+      if (config.components.code) {
+        return createVNode(
+          'pre',
+          preAttrs,
+          [createVNode(config.components.code, { key: highlighted, ...attrs, text: token.content, info: token.info }, () => [])]
+        )
+
+      }
 
       return createVNode(
         'pre',
@@ -528,7 +556,7 @@ export default function (md, config = {
     const rules = this.rules
     const vNodeParents = []
 
-    return tokens.map((token, i) => {
+    const result = tokens.map((token, i) => {
       processToken(token, env)
       if (token.block) {
         if (token.attrSet) {
@@ -545,22 +573,12 @@ export default function (md, config = {
       } else if (rules[type]) {
         const result = rules[type](tokens, i, options, env, this)
         if (typeof result === 'string') {
-          console.log(result)
           vnode = createHtmlVNode(result)
         } else if (result && result.node && result.parent) {
           parent = result.parent
           vnode = result.node
         } else {
           vnode = result
-        }
-      } else if (type.startsWith('container_') && (type.endsWith('_open') || type.endsWith('_close'))) {
-        // Handle markdown-it-container tokens that generate HTML
-        const renderer = md.renderer.rules[type]
-        if (renderer) {
-          const htmlResult = renderer(tokens, i, options, env, md.renderer)
-          if (typeof htmlResult === 'string') {
-            vnode = createHtmlVNode(htmlResult)
-          }
         }
       } else {
         vnode = this.renderToken(tokens, i, options)
@@ -583,6 +601,8 @@ export default function (md, config = {
         if (typeof parentNode.type === 'string' || parentNode.type === Fragment) {
           const children = Array.isArray(parentNode.children) ? parentNode.children : []
           parentNode.children = children.concat([vnode])
+
+          console.log(parentNode.children)
         }
         isChild = true
       }
@@ -601,6 +621,8 @@ export default function (md, config = {
 
       return isChild ? null : vnode
     }).filter(node => !!node)
+
+    return result
   }
 
   md.renderer.rules = { ...md.renderer.rules, ...defaultRules }

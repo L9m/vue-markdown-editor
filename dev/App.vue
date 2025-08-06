@@ -3,6 +3,14 @@
     <button @click="load">
       加载
     </button>
+
+    <button @click="type">
+      打字
+    </button>
+
+    <button @click="full">
+      完整
+    </button>
     <v-md-editor
       :include-level="[1,2, 3, 4, 5, 6]"
       v-model="text"
@@ -31,12 +39,12 @@ export default {
   },
   data() {
     return {
-      text,
+      text: '',
       html,
     };
   },
-  mounted() {
-    this.load();
+  async mounted() {
+    this.text = await this.load();
   },
   methods: {
     handleFullscreenChange(v) {
@@ -56,29 +64,32 @@ export default {
     handleCopyCodeSuccess(code) {
       console.log(code);
     },
+
     async load() {
+      const md = await fetch('./dev/code.md');
+      const text = await md.text();
+      return text
+    },
+
+    async type() {
       this.text = '';
       let size = 1;
       let start = 0;
 
-      const md = await fetch('./dev/md1.md');
-      const text = await md.text();
-      this.text =text
+      this.text = ''
+      const fullText = await this.load()
 
-    
-      // this.text = '<iframe src="https://markdown.com.cn/basic-syntax/" width="500" height="500"></iframe>'
+      async function* processChunk() {
+        while (start < fullText.length) {
+          await new Promise((resolve) => setTimeout(resolve, 10));
+          this.text += fullText.substring(start, (start += size));
+          yield start;
+        }
+      }
 
-      // async function* processChunk() {
-      //   while (start < text.length) {
-      //     await new Promise((resolve) => setTimeout(resolve, 10));
-      //     this.text += text.substring(start, (start += size));
-      //     yield start;
-      //   }
-      // }
-
-      // for await (const pos of processChunk.call(this)) {
-      //   // console.log('pos', text[pos]);
-      // }
+      for await (const pos of processChunk.call(this)) {
+        // console.log('pos', text[pos]);
+      }
     },
   }
 };

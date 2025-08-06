@@ -37,9 +37,8 @@ export default function (
     } else {
       // fallback default
       renderBefore = (info) => {
-        return `<div class="${blockClass} ${type}">${
-          info ? `<p class="${blockClass}-title">${ md.renderInline(info)}</p>` : ''
-        }\n`
+        return `<div class="${blockClass} ${type}">${info ? `<p class="${blockClass}-title">${info}</p>` : ''
+          }\n`
       };
       renderAfter = () => '</div>\n';
     }
@@ -60,6 +59,7 @@ export default function (
       if (token.nesting === 1) {
         return renderBefore(info);
       }
+
 
       return renderAfter(info);
     };

@@ -21,6 +21,7 @@ import createMermaidPlugin from '@/plugins/mermaid/npm';
 import createCreateCopyCodePreview from '@/plugins/copy-code/preview';
 import createDiffDOMPlugin from '@/plugins/incremental-dom/npm';
 import createCursorPlugin from '@/plugins/cursor/index';
+import createAlignPlugin from '@/plugins/align/index'
 
 import vuepressTheme from '@/theme/vuepress';
 import enUS from '@/lang/en-US';
@@ -53,7 +54,7 @@ const app = createApp(App);
 
 PreviewHtml.use(createCreateCopyCodePreview());
 
-VueMarkdownEditor.lang.use('en-US', enUS);
+VueMarkdownEditor.lang.use('zh-CN', enUS);
 
 VueMarkdownEditor.use(githubTheme, {
   codeHighlightExtensionMap: {
@@ -73,6 +74,7 @@ VueMarkdownEditor.use(githubTheme, {
 
 import GMathVue from './components/GMath.vue';
 import GMermaidVue from './components/GMermaid.vue';
+import GCode from './components/GCode.vue';
 
 VueMarkdownEditor.use(createEmojiPlugin())
   .use(createKatexPlugin({
@@ -89,10 +91,12 @@ VueMarkdownEditor.use(createEmojiPlugin())
   .use(createHighLinesPlugin())
   .use(createMermaidPlugin())
   .use(createCursorPlugin())
+  .use(createAlignPlugin())
   .use(createDiffDOMPlugin({
     components: {
       'math': GMathVue,
-      'mermaid': GMermaidVue
+      'mermaid': GMermaidVue,
+      'code': GCode
     },
     enableMathBlockInHtml: true,
     enableMathInlineInHtml: true,

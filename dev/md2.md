@@ -5,10 +5,12 @@
 
 <div>（1）已知 $0&lt;x&lt;\frac{3}{2}$ ，当 $x(3-2x)$ 取得最大值时，$x$ 的值为（ ）</div>
 
-<!-- <p style="font-size: 14px; margin-bottom: 1em;">（1）已知 $0<x<\frac{3}{2}$ ，当 $x(3-2x)$ 取得最大值时，$x$ 的值为（ ）
+<div>中文</div>
+
+<p style="font-size: 14px; margin-bottom: 1em;">（1）已知 $0<x<\frac{3}{2}$ ，当 $x(3-2x)$ 取得最大值时，$x$ 的值为（ ）
 
 <div>（1）已知 $0<x<\frac{3}{2}$ ，当 $x(3-2x)$ 取得最大值时，$x$ 的值为（ ）</div>
 
-</p> -->
+</p>
 
 $0<x<\frac{3}{2}$

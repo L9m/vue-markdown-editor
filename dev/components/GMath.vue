@@ -12,7 +12,7 @@ import katex from 'katex'
 import 'katex/dist/katex.min.css'
 
 const props = defineProps({
-  content: {
+  text: {
     type: String,
     default: '',
     required: true
@@ -21,14 +21,6 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
-  markup: {
-    type: String,
-    default: '$'
-  },
-  displayMode: {
-    type: Boolean,
-    default: undefined // 如果未定义，则根据 type 和 isBlock 推断
-  }
 })
 
 const mathRef = ref(null)
@@ -41,12 +33,12 @@ const wrapperTag = computed(() => {
 
 // 计算属性：渲染的数学公式
 const renderedMath = computed(() => {
-  if (!props.content) {
+  if (!props.text) {
     return ''
   }
 
   try {
-    return katex.renderToString(props.content, {
+    return katex.renderToString(props.text, {
       throwOnError: false,
       errorColor: '#cc0000',
       strict: false,

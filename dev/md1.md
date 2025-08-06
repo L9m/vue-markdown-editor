@@ -76,7 +76,7 @@ export default {
 <iframe src="https://code-farmer-i.github.io/vue-markdown-editor/zh/plugins/mermaid.html#%E4%BD%BF%E7%94%A8"></iframe>
 
 <div style="padding: 20px; border-left: 5px solid #3f51b5; border-radius: 5px; margin-bottom: 20px; line-height: 1.8; font-size: 16px; word-wrap: break-word;">
-<h3 style="text-align: center; color: black; font-weight: bold;">利用基本不等式求最值</h3>
+<h3 style="text-align: center; color: black; font-weight: bold;">利用基本不等式求最值$</h3>
 <h4 style="background: linear-gradient(to right, #26a69a, #4db6ac); padding: 5px; color: white;">关键点</h4>
 <p style="font-size: 14px; text-indent: 2em;">
 利用基本不等式求最值的关键在于：依定值去探求最值，探求的过程中常需依据具体的问题进行合理的拆、凑、配等变换。

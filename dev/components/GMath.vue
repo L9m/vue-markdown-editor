@@ -1,74 +1,58 @@
 <template>
-  <component 
-    :is="wrapperTag" 
+  <component
+    :is="wrapperTag"
     ref="mathRef"
     v-html="renderedMath"
   />
 </template>
 
 <script setup>
-import { ref, computed, watch} from 'vue'
-import katex from 'katex'
-import 'katex/dist/katex.min.css'
+/* eslint-env vue/setup-compiler-macros */
+/* global defineProps */
+import { ref, computed } from 'vue';
+import {renderKatex} from './katexWorkerManager'
 
 const props = defineProps({
   text: {
     type: String,
     default: '',
-    required: true
+    required: true,
+  },
+  // 如果使用 webworker 模式，需要传入 katexUrl
+  katexUrl: {
+    type: String,
+    default: 'https://frontend-cdn.qimingdaren.com/cdn/jquery/katex-v3/katex.min.js',
   },
   isBlock: {
     type: Boolean,
-    default: false
+    default: false,
   },
-})
-
-const mathRef = ref(null)
-
-// 计算属性：包装元素标签
-const wrapperTag = computed(() => {
-  return props.isBlock ? 'div' : 'span'
-})
-
-
-// 计算属性：渲染的数学公式
-const renderedMath = computed(() => {
-  if (!props.text) {
-    return ''
-  }
-
-  try {
-    return katex.renderToString(props.text, {
-      throwOnError: false,
-      errorColor: '#cc0000',
-      strict: false,
+  options: {
+    type: Object,
+    default: () => ({
+      webworker: true,
+      displayError: false,
       macros: {
         "\\overparen": "\\overgroup"
       }
-    })
-  } catch (error) {
-    console.warn('KaTeX render error:', error)
-    return `<span class="katex-error" title="${escapeHtml(props.content)}">${escapeHtml(props.content)}</span>`
-  }
-})
+    }),
+  },
+});
 
-// 辅助函数：HTML 转义
-function escapeHtml(unsafe) {
-  if (typeof unsafe !== 'string') {
-    return unsafe
-  }
-  return unsafe
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;')
+// 在模板中使用，但 ESLint 可能无法静态识别
+/* eslint-disable-next-line no-unused-vars */
+const mathRef = ref(null);
+
+// 包装元素标签（在模板中使用，但 ESLint 可能无法静态识别）
+// eslint-disable-next-line no-unused-vars
+const wrapperTag = computed(() => (props.isBlock ? 'div' : 'span'));
+
+function renderToString(tex, options) {
+  const str = renderKatex(tex, options, props.katexUrl)
+  return str
 }
 
-// 监听内容变化
-watch(() => props.content, () => {
-  // 内容变化时会自动重新计算 renderedMath
-}, { immediate: true })
+// 渲染后的 HTML（computed）
+/* eslint-disable-next-line no-unused-vars */
+const renderedMath = computed(() => renderToString(props.text, props.options));
 </script>
-
-

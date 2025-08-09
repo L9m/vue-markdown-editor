@@ -35,26 +35,6 @@ import { reactive } from 'vue';
 // import xss from '@/utils/xss/index';
 import { VMdParser } from '@/utils/v-md-parser';
 
-function debounce(func, threshold, immediate) {
-  let timeout;
-  return function debounced() {
-    let obj = this, args = arguments;
-    function delayed() {
-      if (!immediate)
-        func.apply(obj, args);
-      timeout = null;
-    }
-
-    if (timeout)
-      clearTimeout(timeout);
-    else if (immediate)
-      func.apply(obj, args);
-
-    timeout = setTimeout(delayed, threshold || 100);
-  };
-
-}
-
 // mixins
 import PreviewMixin from '@/mixins/preview';
 
@@ -68,25 +48,22 @@ const component = {
     },
     theme: Object,
     beforeChange: Function,
-    debounce: {
-      type: Number,
-      default: 0,
-    },
     showCursor: Boolean,
   },
   emits: ['change'],
   data() {
     return {
       html: '',
-      currentVNode: null
+      currentVNode: null,
+      isRendering: false,
     };
   },
   watch: {
     text() {
-      this.debouncedHandleTextChange();
+      this.parser();
     },
     langConfig() {
-      this.handleTextChange();
+      this.parser();
     },
   },
   computed: {
@@ -111,36 +88,20 @@ const component = {
     },
   },
   created() {
-    if (this.debounce) {
-      this.debouncedHandleTextChange = debounce(function () {
-        this.handleTextChange();
-      }, this.debounce);
-    } else {
-      this.debouncedHandleTextChange = this.handleTextChange;
-    }
-
-    this.handleTextChange();
+    this.parser();
   },
   methods: {
     handleTextChange() {
       const next = (text) => {
-        if (this.showCursor) {
-          let tempText = text
-          tempText = tempText.replace(' [[qm-private-cursor]]', '')
-          text = tempText + ' [[qm-private-cursor]]'
-        }
+        // if (this.showCursor) {
+        //   let tempText = text
+        //   tempText = tempText.replace(' [[qm-private-cursor]]', '')
+        //   text = tempText + ' [[qm-private-cursor]]'
+        // }
         
-        if (this.isDiffDom) {
-          // 使用 VNode 渲染 (diff-dom)
-          const vNode = this.$options.vMdParser.parse(text)
-          this.currentVNode = vNode
-          this.html = '' // 清空 HTML
-        } else {
-          // 使用 HTML 渲染 (传统方式)
-          const html = this.$options.vMdParser.parse(text)
-          this.html = html
-          this.currentVNode = null // 清空 VNode
-        }
+        const vNode = this.$options.vMdParser.parse(text)
+        this.currentVNode = vNode
+        this.html = '' // 清空 HTML
         
         this.$emit('change', text, this.html);
       };
@@ -151,6 +112,21 @@ const component = {
         next(this.text);
       }
     },
+
+    parser() {
+      if (this.isRendering) {
+        return
+      }
+      this.isRendering = true;
+      requestAnimationFrame(() => {
+        const vNode = this.$options.vMdParser.parse(this.text)
+        this.currentVNode = vNode
+        this.html = ''
+        this.$emit('change', this.text, this.html);
+        this.isRendering = false;
+      });
+
+    }
   },
 };
 

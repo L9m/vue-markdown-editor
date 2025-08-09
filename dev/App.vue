@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="height: 100vh;">
     <button @click="load">
       加载
     </button>
@@ -14,7 +14,7 @@
     <v-md-editor
       :include-level="[1,2, 3, 4, 5, 6]"
       v-model="text"
-      height="500px"
+      height="100vh"
       autofocus
       :debounce="0"
       :disabled-menus="[]"
@@ -29,7 +29,6 @@
 </template>
 
 <script>
-import text from './text';
 import html from './html';
 import GMath from './components/GMath'
 
@@ -66,7 +65,7 @@ export default {
     },
 
     async load() {
-      const md = await fetch('./dev/code.md');
+      const md = await fetch('./dev/long.md');
       const text = await md.text();
       return text
     },
@@ -74,22 +73,31 @@ export default {
     async type() {
       this.text = '';
       let size = 1;
-      let start = 0;
+      let start = 200;
 
       this.text = ''
       const fullText = await this.load()
 
+      console.log(fullText.length)
+
+      this.text = fullText.substring(0, start)
+      console.time('1')
+
       async function* processChunk() {
         while (start < fullText.length) {
-          await new Promise((resolve) => setTimeout(resolve, 10));
+          await new Promise((resolve) => requestAnimationFrame(resolve));
+          
           this.text += fullText.substring(start, (start += size));
           yield start;
         }
       }
 
-      for await (const pos of processChunk.call(this)) {
+      // eslint-disable-next-line no-unused-vars
+      for await (const _ of processChunk.call(this)) {
         // console.log('pos', text[pos]);
       }
+
+       console.timeEnd('1')
     },
   }
 };

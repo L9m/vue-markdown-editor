@@ -1,9 +1,18 @@
 <!-- GCode.vue -->
 <template>
   <code class="relative">
-    <div v-if="shouldHighlight" class="highlight-lines">
-      <template v-for="(line, index) in lines" :key="index">
-        <div v-if="isLineHighlighted(index + 1)" class="highlighted">&nbsp;</div>
+    <div
+      v-if="shouldHighlight"
+      class="highlight-lines"
+    >
+      <template
+        v-for="(line, index) in lines"
+        :key="index"
+      >
+        <div
+          v-if="isLineHighlighted(index + 1)"
+          class="highlighted"
+        >&nbsp;</div>
         <br v-else>
       </template>
     </div>
@@ -14,6 +23,7 @@
 <script setup>
 import { computed } from 'vue'
 
+// eslint-disable-next-line no-undef
 const props = defineProps({
   text: {
     type: String,
@@ -29,6 +39,7 @@ const props = defineProps({
   }
 })
 
+// eslint-disable-next-line no-unused-vars
 const lines = computed(() => {
   return props.text.split('\n')
 })
@@ -57,6 +68,7 @@ const lineNumbers = computed(() => {
     .map((v) => v.split('-').map((v) => parseInt(v, 10)))
 })
 
+// eslint-disable-next-line no-unused-vars
 const isLineHighlighted = (lineNumber) => {
   return lineNumbers.value.some(([start, end]) => {
     if (start && end) {

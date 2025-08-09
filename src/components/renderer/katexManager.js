@@ -6,8 +6,7 @@ let messageQueue = [];
 let isProcessing = false;
 let katexWorker = null;
 let isListenerAttached = false;
-// webpack4 用法：让 worker-loader 处理 .worker.js
-import KatexWorker from '../workers/katex-worker.worker.js';
+import KatexWorker from './workers/katex-worker.worker.js';
 import katex from 'katex';
 
 // 默认 KaTeX 配置
@@ -33,7 +32,7 @@ function initializeWorker() {
   rootScope.__katex_worker__ = katexWorker; // 持久化以防 GC
 }
 
-function showKatex(data) {
+function displayKatex(data) {
   if (data && data.result) {
     const placeholderEle = document.querySelector(`#katex-${data.id}`);
     if (placeholderEle) {
@@ -63,7 +62,7 @@ function attachMessageListener() {
     if (tex && result) {
       cache.set(tex, result);
     }
-    showKatex({ id, result, error, options });
+    displayKatex({ id, result, error, options });
 
     // 处理队列中的下一个消息
     if (messageQueue.length > 0) {
@@ -81,7 +80,10 @@ function attachMessageListener() {
 // 处理消息队列
 function queueMessage(message) {
   if (!hasWorkerSupport || !katexWorker) {
-    showKatex({ error: 'Web Worker not supported or not initialized', options: message.options });
+    displayKatex({
+      error: 'Web Worker not supported or not initialized',
+      options: message.options,
+    });
     return;
   }
 

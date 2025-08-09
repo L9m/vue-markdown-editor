@@ -30,12 +30,8 @@
 
 <script>
 import html from './html';
-import GMath from './components/GMath'
 
 export default {
-  components: {
-    GMath
-  },
   data() {
     return {
       text: '',

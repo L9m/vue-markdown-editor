@@ -19,9 +19,9 @@ import '@/plugins/highlight-lines/highlight-lines';
 import createMermaidPlugin from '@/plugins/mermaid/npm';
 
 import createCreateCopyCodePreview from '@/plugins/copy-code/preview';
-import createDiffDOMPlugin from '@/plugins/incremental-dom/npm';
+import createVNodePlugin from '@/plugins/v-node/index';
 import createCursorPlugin from '@/plugins/cursor/index';
-import createAlignPlugin from '@/plugins/align/index'
+import createAlignPlugin from '@/plugins/align/index';
 
 import vuepressTheme from '@/theme/vuepress';
 import enUS from '@/lang/en-US';
@@ -72,19 +72,21 @@ VueMarkdownEditor.use(githubTheme, {
 // });
 // Preview.use(githubTheme);
 
-import GMathVue from './components/GMath.vue';
-import GMermaidVue from './components/GMermaid.vue';
-import GCode from './components/GCode.vue';
+import GMathVue from '@/components/renderer/math.vue';
+import GMermaidVue from '@/components/renderer/mermaid.vue';
+import GCode from '@/components/renderer/Gcode.vue';
 
 VueMarkdownEditor.use(createEmojiPlugin())
-  .use(createKatexPlugin({
-    enableMathBlockInHtml: false,
-    enableMathInlineInHtml: false,
-    strict: false,
-    useWebWorker: false,
-    throwOnError: true,
-    displayError: true
-  }))
+  .use(
+    createKatexPlugin({
+      enableMathBlockInHtml: false,
+      enableMathInlineInHtml: false,
+      strict: false,
+      useWebWorker: false,
+      throwOnError: true,
+      displayError: true,
+    })
+  )
   .use(createTodoListPlugin())
   .use(createLineNumberPlugin())
   .use(createCopyCodePlugin())
@@ -92,15 +94,17 @@ VueMarkdownEditor.use(createEmojiPlugin())
   .use(createMermaidPlugin())
   .use(createCursorPlugin())
   .use(createAlignPlugin())
-  .use(createDiffDOMPlugin({
-    components: {
-      'math': GMathVue,
-      'mermaid': GMermaidVue,
-      'code': GCode
-    },
-    enableMathBlockInHtml: true,
-    enableMathInlineInHtml: true,
-  }))
+  .use(
+    createVNodePlugin({
+      components: {
+        math: GMathVue,
+        mermaid: GMermaidVue,
+        code: GCode,
+      },
+      enableMathBlockInHtml: true,
+      enableMathInlineInHtml: true,
+    })
+  );
 
 VueMarkdownEditor.Codemirror = Codemirror;
 

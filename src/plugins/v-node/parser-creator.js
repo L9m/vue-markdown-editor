@@ -1,11 +1,11 @@
-import markdownItDiffDom from '@/utils/markdown-it-diff-dom';
+import markdownItVNode from '@/utils/markdown-it-vnode';
 
 export default function parserCreator() {
   return function parser(vMdParser, options) {
     vMdParser.extendMarkdown((mdParser) => {
-        mdParser.use(markdownItDiffDom, {
-          ...options,
-        });
+      mdParser.use(markdownItVNode, {
+        ...options,
+      });
     });
   };
 }

@@ -10,6 +10,7 @@
 <script setup>
 import { ref, computed, watch, nextTick, onMounted } from 'vue'
 
+// eslint-disable-next-line no-undef
 const props = defineProps({
   content: {
     type: String,
@@ -55,6 +56,7 @@ const defaultMermaidConfig = {
 }
 
 // 计算属性：CSS 类名
+// eslint-disable-next-line no-unused-vars
 const mermaidClasses = computed(() => {
   return {
     'g-mermaid': true,
@@ -183,14 +185,14 @@ onMounted(async () => {
   text-align: center;
   
   .mermaid-error {
-    color: #d73a49;
-    background-color: #ffeef0;
-    border: 1px solid #fdaeb7;
+    margin: 8px 0;
     padding: 12px 16px;
-    border-radius: 6px;
+    color: #d73a49;
     font-size: 14px;
     text-align: left;
-    margin: 8px 0;
+    background-color: #ffeef0;
+    border: 1px solid #fdaeb7;
+    border-radius: 6px;
     
     strong {
       display: block;
@@ -200,18 +202,18 @@ onMounted(async () => {
 }
 
 // 深度样式，用于 mermaid 渲染的 SVG
-:deep(.mermaid) {
-  svg {
-    max-width: 100%;
-    height: auto;
-  }
-}
+// :deep(.mermaid) {
+//   svg {
+//     max-width: 100%;
+//     height: auto;
+//   }
+// }
 
-// 确保与原插件样式兼容
-:deep(.v-md-mermaid) {
-  svg {
-    max-width: 100%;
-    height: auto;
-  }
-}
+// // 确保与原插件样式兼容
+// :deep(.v-md-mermaid) {
+//   svg {
+//     max-width: 100%;
+//     height: auto;
+//   }
+// }
 </style>

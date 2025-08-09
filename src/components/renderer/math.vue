@@ -10,7 +10,7 @@
 /* eslint-env vue/setup-compiler-macros */
 /* global defineProps */
 import { ref, computed } from 'vue';
-import {renderKatex} from './katexWorkerManager'
+import {renderKatex} from './katexManager'
 
 const props = defineProps({
   text: {

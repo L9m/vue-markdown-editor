@@ -8,7 +8,7 @@ import githubTheme from '@/theme/github/index';
 
 import createEmojiPlugin from '@/plugins/emoji/full';
 import '@/plugins/emoji/emoji';
-import createKatexPlugin from '@/plugins/katex/cdn';
+import createKatexPlugin from '@/plugins/katex';
 import createTodoListPlugin from '@/plugins/todo-list/index';
 import '@/plugins/todo-list/todo-list';
 import createLineNumberPlugin from '@/plugins/line-number/index';
@@ -23,10 +23,10 @@ import createVNodePlugin from '@/plugins/v-node/index';
 import createCursorPlugin from '@/plugins/cursor/index';
 import createAlignPlugin from '@/plugins/align/index';
 
-import vuepressTheme from '@/theme/vuepress';
+// import vuepressTheme from '@/theme/vuepress';
 import enUS from '@/lang/en-US';
 
-import Prism from 'prismjs';
+// import Prism from 'prismjs';
 
 // codemirror 编辑器的相关资源
 import Codemirror from 'codemirror';
@@ -74,17 +74,13 @@ VueMarkdownEditor.use(githubTheme, {
 
 import GMathVue from '@/components/renderer/math.vue';
 import GMermaidVue from '@/components/renderer/mermaid.vue';
-import GCode from '@/components/renderer/Gcode.vue';
+import GCode from '@/components/renderer/PreCode.vue';
 
 VueMarkdownEditor.use(createEmojiPlugin())
   .use(
     createKatexPlugin({
       enableMathBlockInHtml: false,
       enableMathInlineInHtml: false,
-      strict: false,
-      useWebWorker: false,
-      throwOnError: true,
-      displayError: true,
     })
   )
   .use(createTodoListPlugin())
@@ -111,7 +107,7 @@ VueMarkdownEditor.Codemirror = Codemirror;
 VueMarkdownEditor.xss.extend({
   // 扩展白名单
   whiteList: {
-    iframe: ['src', 'width', 'height'],
+    iframe: ['width', 'height'],
   },
 });
 

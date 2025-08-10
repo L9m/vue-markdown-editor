@@ -1,5 +1,11 @@
 # 数学公式集
 
+<iframe src="https://code-farmer-i.github.io/vue-markdown-editor/zh/plugins/mermaid.html#%E4%BD%BF%E7%94%A8"></iframe>
+
+<script>
+    alert('111')
+</script>
+
 ## 代数
 
 1. **二次方程求根公式**:

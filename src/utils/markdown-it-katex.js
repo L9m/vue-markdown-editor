@@ -598,77 +598,8 @@ function inlineBracketBlock(state, silent) {
   return true;
 }
 
-// For any html block that contains math, replace the html block token with new tokens that separate out
-// the html blocks from the math
-function handleMathInHtml(state, mathType, mathMarkup, mathRegex) {
-  const tokens = state.tokens;
-
-  for (let index = tokens.length - 1; index >= 0; index--) {
-    const currentToken = tokens[index];
-    const newTokens = [];
-
-    if (currentToken.type !== 'html_block') {
-      continue;
-    }
-
-    const content = currentToken.content;
-
-    // Process for each math referenced within the html block
-    for (const match of content.matchAll(mathRegex)) {
-      if (!match.groups) {
-        continue;
-      }
-
-      const html_before_math = match.groups.html_before_math;
-      const math = match.groups.math;
-      const html_after_math = match.groups.html_after_math;
-
-      let type = mathType === 'math_block' ? 'html_block' : 'html_inline';
-
-      if (html_before_math) {
-        newTokens.push({
-          ...currentToken,
-          type,
-          map: null,
-          content: html_before_math,
-        });
-      }
-
-      if (math) {
-        newTokens.push({
-          ...currentToken,
-          type: mathType,
-          map: null,
-          content: math,
-          markup: mathMarkup,
-          block: true,
-          tag: 'math',
-        });
-      }
-
-      if (html_after_math) {
-        newTokens.push({
-          ...currentToken,
-          type,
-          map: null,
-          content: html_after_math,
-        });
-      }
-    }
-
-    // Replace the original html_block token with the newly expanded tokens
-    if (newTokens.length > 0) {
-      tokens.splice(index, 1, ...newTokens);
-    }
-  }
-  return true;
-}
-
 export default function (md, options) {
   const enableBareBlocks = options.enableBareBlocks;
-  const enableMathBlockInHtml = options.enableMathBlockInHtml;
-  const enableMathInlineInHtml = options.enableMathInlineInHtml;
-  const enableFencedBlocks = options.enableFencedBlocks;
   // #region Parsing
   md.inline.ruler.after('escape', 'math_inline', inlineMath);
   md.inline.ruler.after('escape', 'math_inline_block', inlineMathBlock);
@@ -695,23 +626,5 @@ export default function (md, options) {
   md.block.ruler.after('blockquote', 'math_bracket_block', blockBracketMath, {
     alt: ['paragraph', 'reference', 'blockquote', 'list'],
   });
-
-  // Regex to capture any html prior to math block, the math block (single or multi line), and any html after the math block
-  const math_block_within_html_regex = /(?<html_before_math>[\s\S]*?)\$\$(?<math>[\s\S]+?)\$\$(?<html_after_math>(?:(?!\$\$[\s\S]+?\$\$)[\s\S])*)/gm;
-
-  // Regex to capture any html prior to math inline, the math inline (single line), and any html after the math inline
-  const math_inline_within_html_regex = /(?<html_before_math>[\s\S]*?)\$(?<math>.*?)\$(?<html_after_math>(?:(?!\$.*?\$)[\s\S])*)/gm;
-
-  if (enableMathBlockInHtml) {
-    md.core.ruler.push('math_block_in_html_block', (state) => {
-      return handleMathInHtml(state, 'math_block', '$$', math_block_within_html_regex);
-    });
-  }
-
-  if (enableMathInlineInHtml) {
-    md.core.ruler.push('math_inline_in_html_block', (state) => {
-      return handleMathInHtml(state, 'math_inline', '$', math_inline_within_html_regex);
-    });
-  }
   // #endregion
 }

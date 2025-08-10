@@ -1,29 +1,11 @@
 import { createVNode, Fragment, Comment, Text } from 'vue';
 import { escapeHtml, unescapeAll } from 'markdown-it/lib/common/utils';
+import xss from '@/utils/xss/index';
 
 // 数学公式处理正则表达式
 const math_block_within_html_regex = /(?<html_before_math>[\s\S]*?)\$\$(?<math>[\s\S]+?)\$\$(?<html_after_math>(?:(?!\$\$[\s\S]+?\$\$)[\s\S])*)/gm;
 const math_inline_within_html_regex = /(?<html_before_math>[\s\S]*?)\$(?<math>.*?)\$(?<html_after_math>(?:(?!\$.*?\$)[\s\S])*)/gm;
 
-export const DOM_ATTR_NAME = {
-  SOURCE_LINE_START: 'data-source-line',
-  SOURCE_LINE_END: 'data-source-line-end',
-  ORIGIN_SRC: 'origin-src',
-  TARGET_REPO: 'target-repo',
-  TARGET_PATH: 'target-path',
-  LOCAL_IMAGE: 'local-image',
-  ONLY_CHILD: 'auto-center',
-  TOKEN_IDX: 'data-token-idx',
-  DISPLAY_NONE: 'display-none',
-  WIKI_LINK: 'wiki-link',
-  WIKI_RESOURCE: 'wiki-resource',
-  IS_ANCHOR: 'is-anchor',
-  SKIP_EXPORT: 'skip-export',
-  DATA_HASHTAG: 'data-hashtag',
-};
-
-const sensitiveUrlReg = /^javascript:|vbscript:|file:/i;
-const sensitiveAttrReg = /^href|src|xlink:href|poster|srcset$/i;
 const attrNameReg = /^[a-zA-Z_:][a-zA-Z0-9:._-]*$/;
 const attrEventReg = /^on/i;
 const defaultRules = {};
@@ -60,6 +42,7 @@ export default function (
     return attrNameReg.test(name) && !attrEventReg.test(name);
   }
 
+  // eslint-disable-next-line no-unused-vars
   function getLine(token, env) {
     const [lineStart, lineEnd] = token.map || [0, 1];
 
@@ -80,40 +63,27 @@ export default function (
     return [lineStart + sOffset, lineEnd + sOffset];
   }
 
-  function processToken(token, env) {
+  function processToken(token) {
     if (!token.meta) {
       token.meta = {};
     }
 
-    if (env?.safeMode) {
-      token.attrs?.forEach(([name, val]) => {
-        name = name.toLowerCase();
-        if (sensitiveAttrReg.test(name) && sensitiveUrlReg.test(val)) {
-          token.attrSet(name, '');
-        }
+    // if (token.block) {
+    //   const [lineStart, lineEnd] = getLine(token, env);
 
-        if (name === 'href' && val.toLowerCase().startsWith('data:')) {
-          token.attrSet(name, '');
-        }
-      });
-    }
+    //   if (token.map) {
+    //     token.attrSet(DOM_ATTR_NAME.SOURCE_LINE_START, String(lineStart + 1));
+    //     token.attrSet(DOM_ATTR_NAME.SOURCE_LINE_END, String(lineEnd + 1));
+    //     if (!token.meta.attrs) {
+    //       token.meta.attrs = {};
+    //     }
 
-    if (token.block) {
-      const [lineStart, lineEnd] = getLine(token, env);
-
-      if (token.map) {
-        token.attrSet(DOM_ATTR_NAME.SOURCE_LINE_START, String(lineStart + 1));
-        token.attrSet(DOM_ATTR_NAME.SOURCE_LINE_END, String(lineEnd + 1));
-        if (!token.meta.attrs) {
-          token.meta.attrs = {};
-        }
-
-        // transform array to object
-        token.attrs?.forEach(([name, val]) => {
-          token.meta.attrs[name] = val;
-        });
-      }
-    }
+    //     // transform array to object
+    //     token.attrs?.forEach(([name, val]) => {
+    //       token.meta.attrs[name] = val;
+    //     });
+    //   }
+    // }
   }
 
   defaultRules.code_inline = function (tokens, idx, _options, _, slf) {
@@ -122,7 +92,8 @@ export default function (
     if (config.components.code) {
       return createVNode(config.components.code, {
         ...slf.renderAttrs(token),
-        info: token.info,
+        isBlock: false,
+        info: '',
         text: token.content,
       });
     } else {
@@ -133,25 +104,26 @@ export default function (
   defaultRules.code_block = function (tokens, idx, _options, _, slf) {
     const token = tokens[idx];
     const attrs = slf.renderAttrs(token);
-    const preAttrs = {
-      [DOM_ATTR_NAME.SOURCE_LINE_START]: attrs[DOM_ATTR_NAME.SOURCE_LINE_START],
-      [DOM_ATTR_NAME.SOURCE_LINE_END]: attrs[DOM_ATTR_NAME.SOURCE_LINE_END],
-    };
+    // const preAttrs = {
+    //   [DOM_ATTR_NAME.SOURCE_LINE_START]: attrs[DOM_ATTR_NAME.SOURCE_LINE_START],
+    //   [DOM_ATTR_NAME.SOURCE_LINE_END]: attrs[DOM_ATTR_NAME.SOURCE_LINE_END],
+    // };
 
-    delete attrs[DOM_ATTR_NAME.SOURCE_LINE_START];
-    delete attrs[DOM_ATTR_NAME.SOURCE_LINE_END];
+    // delete attrs[DOM_ATTR_NAME.SOURCE_LINE_START];
+    // delete attrs[DOM_ATTR_NAME.SOURCE_LINE_END];
 
+    console.log(config.components.code);
     if (config.components.code) {
-      return createVNode('pre', preAttrs, [
-        createVNode(config.components.code, {
-          ...attrs,
-          info: token.info,
-          text: token.content,
-        }),
-      ]);
+      console.log(token.content);
+      return createVNode(config.components.code, {
+        ...attrs,
+        isBlock: true,
+        info: '',
+        text: token.content,
+      });
     }
 
-    return createVNode('pre', preAttrs, [
+    return createVNode('pre', {}, [
       createVNode('code', attrs, [createVNode(Text, {}, token.content)]),
     ]);
   };
@@ -221,21 +193,14 @@ export default function (
       const preAttrs = {
         'data-info': info,
         'data-lang': langName,
-        [DOM_ATTR_NAME.SOURCE_LINE_START]: attrs[DOM_ATTR_NAME.SOURCE_LINE_START],
-        [DOM_ATTR_NAME.SOURCE_LINE_END]: attrs[DOM_ATTR_NAME.SOURCE_LINE_END],
       };
 
-      delete attrs[DOM_ATTR_NAME.SOURCE_LINE_START];
-      delete attrs[DOM_ATTR_NAME.SOURCE_LINE_END];
-
       if (config.components.code) {
-        return createVNode('pre', preAttrs, [
-          createVNode(
-            config.components.code,
-            { key: highlighted, ...attrs, text: token.content, info: token.info },
-            () => []
-          ),
-        ]);
+        return createVNode(
+          config.components.code,
+          { key: highlighted, ...attrs, text: token.content, info: info, isBlock: true },
+          () => []
+        );
       }
 
       return createVNode('pre', preAttrs, [
@@ -324,6 +289,7 @@ export default function (
     if (!html.trim()) {
       return null;
     }
+    html = xss.process(html);
 
     const processedHtml = handleMathInHtml(html);
 
@@ -385,7 +351,7 @@ export default function (
 
     for (let i = 0; i < element.attributes.length; i++) {
       const attr = element.attributes[i];
-      const attrName = attr.name.toLowerCase();
+      // const attrName = attr.name.toLowerCase();
       let attrValue = attr.value;
 
       if (!validateAttrName(attr.name)) {
@@ -393,14 +359,14 @@ export default function (
       }
 
       // 安全性检查 - 敏感属性和URL
-      if (sensitiveAttrReg.test(attrName) && sensitiveUrlReg.test(attrValue)) {
-        attrValue = '';
-      }
+      // if (sensitiveAttrReg.test(attrName) && sensitiveUrlReg.test(attrValue)) {
+      //   attrValue = '';
+      // }
 
       // 检查 data: URL
-      if (attrName === 'href' && attrValue.toLowerCase().startsWith('data:')) {
-        attrValue = '';
-      }
+      // if (attrName === 'href' && attrValue.toLowerCase().startsWith('data:')) {
+      //   attrValue = '';
+      // }
 
       attrs[attr.name] = attrValue;
     }
@@ -551,11 +517,11 @@ export default function (
     const result = tokens
       .map((token, i) => {
         processToken(token, env);
-        if (token.block) {
-          if (token.attrSet) {
-            token.attrSet(DOM_ATTR_NAME.TOKEN_IDX, i.toString());
-          }
-        }
+        // if (token.block) {
+        //   if (token.attrSet) {
+        //     token.attrSet(DOM_ATTR_NAME.TOKEN_IDX, i.toString());
+        //   }
+        // }
 
         const type = token.type;
 

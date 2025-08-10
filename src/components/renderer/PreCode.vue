@@ -1,27 +1,25 @@
 <!-- GCode.vue -->
 <template>
-  <code class="relative">
-    <div
-      v-if="shouldHighlight"
-      class="highlight-lines"
+  <component
+    :is="wrapperTag"
+    v-bind="outerAttrs"
+  >
+    <code
+      class="relative"
     >
-      <template
-        v-for="(line, index) in lines"
-        :key="index"
-      >
-        <div
-          v-if="isLineHighlighted(index + 1)"
-          class="highlighted"
-        >&nbsp;</div>
-        <br v-else>
-      </template>
-    </div>
-    <slot>{{ text }}</slot>
-  </code>
+      <slot>{{ text }}</slot>
+    </code>
+  </component>
 </template>
 
+<script>
+export default {
+  inheritAttrs: false
+}
+</script>
+
 <script setup>
-import { computed } from 'vue'
+import { computed, Fragment, useAttrs } from 'vue'
 
 // eslint-disable-next-line no-undef
 const props = defineProps({
@@ -39,10 +37,18 @@ const props = defineProps({
   }
 })
 
+const attrs = useAttrs()
+
 // eslint-disable-next-line no-unused-vars
 const lines = computed(() => {
   return props.text.split('\n')
 })
+
+// eslint-disable-next-line no-unused-vars
+const wrapperTag = computed(() => (props.isBlock ? 'pre' : Fragment))
+
+const outerAttrs = computed(() => (props.isBlock ? attrs : {}))
+const innerAttrs = computed(() => (props.isBlock ? {} : attrs))
 
 const shouldHighlight = computed(() => {
   console.log(props.info)
@@ -81,9 +87,9 @@ const isLineHighlighted = (lineNumber) => {
 
 <style scoped>
 .highlighted {
-  background-color: rgba(255, 255, 0, 0.2);
   display: block;
   width: 100%;
   height: 1.4em;
+  background-color: rgba(255, 255, 0, 0.2);
 }
 </style>

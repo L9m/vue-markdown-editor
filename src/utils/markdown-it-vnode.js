@@ -30,38 +30,16 @@ export default function (
     components: {},
   }
 ) {
-  function onLeavepictureinpicture(e) {
-    const target = e.target;
-    if (!target.isConnected) {
-      target.pause();
-    } else {
-      target.scrollIntoViewIfNeeded();
-    }
-  }
 
   function validateAttrName(name) {
     return attrNameReg.test(name) && !attrEventReg.test(name);
   }
 
-  function processToken(token) {
-    if (!token.meta) {
-      token.meta = {};
-    }
-  }
 
   defaultRules.code_inline = function (tokens, idx, _options, _, slf) {
     const token = tokens[idx];
 
-    if (config.components.code) {
-      return createVNode(config.components.code, {
-        ...slf.renderAttrs(token),
-        isBlock: false,
-        info: '',
-        text: token.content,
-      });
-    } else {
-      return createVNode('code', slf.renderAttrs(token), () => token.content);
-    }
+    return createVNode('code', slf.renderAttrs(token), [createVNode(Text, {}, token.content)]);
   };
 
   defaultRules.code_block = function (tokens, idx, _options, _, slf) {
@@ -94,7 +72,6 @@ export default function (
   ];
 
   mathRules.forEach(([ruleName, isBlock]) => {
-    // eslint-disable-next-line no-unused-vars
     defaultRules[ruleName] = (tokens, idx) => {
       return createMathVNode(tokens[idx].content, isBlock)
     };
@@ -193,7 +170,6 @@ export default function (
       {
         controlsList: 'nodownload',
         controls: true,
-        onLeavepictureinpicture,
         ...slf.renderAttrs(token),
       },
       []
@@ -407,8 +383,6 @@ export default function (
 
     const result = tokens
       .map((token, i) => {
-        processToken(token, env);
-
         const type = token.type;
 
         let vnode = null;
@@ -430,25 +404,13 @@ export default function (
         }
 
         let isChild = false;
-        const parentNode = vNodeParents.length > 0 ? vNodeParents[vNodeParents.length - 1] : null;
+        const parentNode = vNodeParents[vNodeParents.length - 1] || null;
 
-        // console.log(vnode,parentNode)
         if (vnode && parentNode) {
-          // 调试：当处理数学公式时打印父节点信息
-          if (type.includes('math')) {
-            // console.log('Math token type:', type)
-            // console.log('Parent node type:', parentNode.type)
-            // console.log('Parent node tag:', parentNode.type)
-            // console.log('VNode type:', vnode.type)
-            // console.log('Stack depth:', vNodeParents.length)
+          if (!Array.isArray(parentNode.children)) {
+            parentNode.children = [];
           }
-
-          if (typeof parentNode.type === 'string' || parentNode.type === Fragment) {
-            const children = Array.isArray(parentNode.children) ? parentNode.children : [];
-            parentNode.children = children.concat([vnode]);
-
-            // console.log(parentNode.children);
-          }
+          parentNode.children.push(vnode);
           isChild = true;
         }
 

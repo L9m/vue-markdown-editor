@@ -15,7 +15,7 @@ import createLineNumberPlugin from '@/plugins/line-number/index';
 // import createCopyCodePlugin from '@/plugins/copy-code/index';
 // import '@/plugins/copy-code/copy-code';
 // import createHighLinesPlugin from '@/plugins/highlight-lines/';
-// import '@/plugins/highlight-lines/highlight-lines';
+import '@/plugins/highlight-lines/highlight-lines';
 import createMermaidPlugin from '@/plugins/mermaid/npm';
 
 import createCreateCopyCodePreview from '@/plugins/copy-code/preview';

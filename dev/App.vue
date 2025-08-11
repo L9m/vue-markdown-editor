@@ -61,7 +61,7 @@ export default {
     },
 
     async load() {
-      const md = await fetch('./dev/html.md');
+      const md = await fetch('./dev/code.md');
       const text = await md.text();
       return text
     },

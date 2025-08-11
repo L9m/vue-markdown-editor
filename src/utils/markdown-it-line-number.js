@@ -18,6 +18,7 @@ export default function (md, { lineMarkup = 'data-line' } = {}) {
       const rawCode = originalRender(tokens, idx, options, env, self);
       const token = tokens[idx];
       const lineNumber = token.map ? token.map[0] + 1 : '';
+      console.log(lineNumber)
 
       return `<div ${lineMarkup}="${lineNumber}">${rawCode}</div>`;
     };

@@ -174,7 +174,7 @@ function blockMath(state, start, end, silent) {
     return false;
   }
 
-  for (next = start; !found; ) {
+  for (next = start; !found;) {
     next++;
 
     if (next >= end) {
@@ -498,7 +498,7 @@ function blockBracketMath(state, start, end, silent) {
     return false;
   }
 
-  for (next = start; !found; ) {
+  for (next = start; !found;) {
     next++;
 
     if (next >= end) {
@@ -598,8 +598,48 @@ function inlineBracketBlock(state, silent) {
   return true;
 }
 
+// For any html block that contains math, replace the html block token with new tokens that separate out
+// the html blocks from the math
+function handleMathInHtml(state, mathType, mathMarkup, mathRegex) {
+  const tokens = state.tokens;
+
+  for (let index = tokens.length - 1; index >= 0; index--) {
+    const currentToken = tokens[index];
+    // const newTokens = [];
+
+    if (currentToken.type !== 'html_block') {
+      continue;
+    }
+
+    const content = currentToken.content;
+    const markdownName = mathType === 'math_block' ? 'MARKDOWN_MATH_BLOCK' : 'MARKDOWN_MATH_INLINE';
+
+
+    // 使用 replace 方法一次性替换所有匹配的数学公式
+    let processedContent = content.replace(mathRegex, (match, ...args) => {
+      const groups = args[args.length - 1]; // 最后一个参数是 groups 对象
+      if (!groups) {
+        return match;
+      }
+
+      const html_before_math = groups.html_before_math || '';
+      const math = groups.math || '';
+      const html_after_math = groups.html_after_math || '';
+
+
+      const commentMath = `<!----${markdownName}_${math}---->`;
+      return `${html_before_math}${commentMath}${html_after_math}`;
+    });
+
+    currentToken.content = processedContent;
+  }
+  return true;
+}
+
 export default function (md, options) {
   const enableBareBlocks = options.enableBareBlocks;
+  const enableMathBlockInHtml = options.enableMathBlockInHtml;
+  const enableMathInlineInHtml = options.enableMathInlineInHtml;
   // #region Parsing
   md.inline.ruler.after('escape', 'math_inline', inlineMath);
   md.inline.ruler.after('escape', 'math_inline_block', inlineMathBlock);
@@ -626,5 +666,23 @@ export default function (md, options) {
   md.block.ruler.after('blockquote', 'math_bracket_block', blockBracketMath, {
     alt: ['paragraph', 'reference', 'blockquote', 'list'],
   });
+
+  // Regex to capture any html prior to math block, the math block (single or multi line), and any html after the math block
+  const math_block_within_html_regex = /(?<html_before_math>[\s\S]*?)\$\$(?<math>[\s\S]+?)\$\$(?<html_after_math>(?:(?!\$\$[\s\S]+?\$\$)[\s\S])*)/gm;
+
+  // Regex to capture any html prior to math inline, the math inline (single line), and any html after the math inline
+  const math_inline_within_html_regex = /(?<html_before_math>[\s\S]*?)\$(?<math>.*?)\$(?<html_after_math>(?:(?!\$.*?\$)[\s\S])*)/gm;
+
+  if (enableMathBlockInHtml) {
+    md.core.ruler.push('math_block_in_html_block', (state) => {
+      return handleMathInHtml(state, 'math_block', '$$', math_block_within_html_regex);
+    });
+  }
+
+  if (enableMathInlineInHtml) {
+    md.core.ruler.push('math_inline_in_html_block', (state) => {
+      return handleMathInHtml(state, 'math_inline', '$', math_inline_within_html_regex);
+    });
+  }
   // #endregion
 }

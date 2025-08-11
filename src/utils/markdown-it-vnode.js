@@ -2,26 +2,27 @@ import { createVNode, Fragment, Comment, Text } from 'vue';
 import { escapeHtml, unescapeAll } from 'markdown-it/lib/common/utils';
 import xss from '@/utils/xss/index';
 
-// 数学公式处理正则表达式
-const math_block_within_html_regex = /(?<html_before_math>[\s\S]*?)\$\$(?<math>[\s\S]+?)\$\$(?<html_after_math>(?:(?!\$\$[\s\S]+?\$\$)[\s\S])*)/gm;
-const math_inline_within_html_regex = /(?<html_before_math>[\s\S]*?)\$(?<math>.*?)\$(?<html_after_math>(?:(?!\$.*?\$)[\s\S])*)/gm;
-
 const attrNameReg = /^[a-zA-Z_:][a-zA-Z0-9:._-]*$/;
 const attrEventReg = /^on/i;
 const defaultRules = {};
 
-const mathVnodeMap = [];
+const mathVnodeMap = new Map()
+const MATH_COMMENT_REGEXP = /--MARKDOWN_MATH_(BLOCK|INLINE)_(.*?)--/;
 
-function randomId(length = 6) {
-  const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-  let result = '';
-  for (let i = 0; i < length; i++) {
-    result += letters.charAt(Math.floor(Math.random() * letters.length));
+function extractMathFormulas(text) {
+  const mathRegex = /<!----MARKDOWN_MATH_(BLOCK|INLINE)_(.*?)---->/g;
+  const formulas = [];
+  let match;
+
+  while ((match = mathRegex.exec(text)) !== null) {
+    formulas.push({
+      type: match[1], // BLOCK 或 INLINE
+      formula: match[2] // 公式内容
+    });
   }
-  return result;
-}
 
-const MATH_COMMENT_REGEXP = /--MARKDOWN_MATH_(\w+)--/;
+  return formulas;
+}
 
 export default function (
   md,
@@ -42,48 +43,10 @@ export default function (
     return attrNameReg.test(name) && !attrEventReg.test(name);
   }
 
-  // eslint-disable-next-line no-unused-vars
-  function getLine(token, env) {
-    const [lineStart, lineEnd] = token.map || [0, 1];
-
-    // macro, calc line offset, see `markdown-macro` plugin.
-    let sOffset = 0;
-    if (env?.macroLines && env.bMarks && env.eMarks) {
-      const sPos = env.bMarks[lineStart];
-      for (let i = 0; i < env.macroLines.length; i++) {
-        const { matchPos, lineOffset, posOffset, currentPosOffset } = env.macroLines[i];
-        if (sPos + posOffset > matchPos && sPos + posOffset - currentPosOffset > matchPos) {
-          sOffset = lineOffset;
-        } else {
-          break;
-        }
-      }
-    }
-
-    return [lineStart + sOffset, lineEnd + sOffset];
-  }
-
   function processToken(token) {
     if (!token.meta) {
       token.meta = {};
     }
-
-    // if (token.block) {
-    //   const [lineStart, lineEnd] = getLine(token, env);
-
-    //   if (token.map) {
-    //     token.attrSet(DOM_ATTR_NAME.SOURCE_LINE_START, String(lineStart + 1));
-    //     token.attrSet(DOM_ATTR_NAME.SOURCE_LINE_END, String(lineEnd + 1));
-    //     if (!token.meta.attrs) {
-    //       token.meta.attrs = {};
-    //     }
-
-    //     // transform array to object
-    //     token.attrs?.forEach(([name, val]) => {
-    //       token.meta.attrs[name] = val;
-    //     });
-    //   }
-    // }
   }
 
   defaultRules.code_inline = function (tokens, idx, _options, _, slf) {
@@ -104,17 +67,7 @@ export default function (
   defaultRules.code_block = function (tokens, idx, _options, _, slf) {
     const token = tokens[idx];
     const attrs = slf.renderAttrs(token);
-    // const preAttrs = {
-    //   [DOM_ATTR_NAME.SOURCE_LINE_START]: attrs[DOM_ATTR_NAME.SOURCE_LINE_START],
-    //   [DOM_ATTR_NAME.SOURCE_LINE_END]: attrs[DOM_ATTR_NAME.SOURCE_LINE_END],
-    // };
-
-    // delete attrs[DOM_ATTR_NAME.SOURCE_LINE_START];
-    // delete attrs[DOM_ATTR_NAME.SOURCE_LINE_END];
-
-    console.log(config.components.code);
     if (config.components.code) {
-      console.log(token.content);
       return createVNode(config.components.code, {
         ...attrs,
         isBlock: true,
@@ -128,34 +81,25 @@ export default function (
     ]);
   };
 
-  // 通用渲染函数
-  function renderMathNode(tokens, idx, slf, isBlock) {
-    const token = tokens[idx];
-    const props = slf.renderAttrs(token);
-    props.isBlock = isBlock;
-    props.text = token.content;
-    return createVNode(config.components.math, props);
-  }
 
-  if (config.components.math) {
-    // 定义规则配置：[ruleName, isBlock]
-    const mathRules = [
-      ['math_block', true],
-      ['math_inline', false],
-      ['math_inline_block', true],
-      ['math_inline_bare_block', true],
-      ['math_bracket_inline', false],
-      ['math_bracket_block', true],
-      ['math_bracket_inline_block', true],
-    ];
+  // 定义规则配置：[ruleName, isBlock]
+  const mathRules = [
+    ['math_block', true],
+    ['math_inline', false],
+    ['math_inline_block', true],
+    ['math_inline_bare_block', true],
+    ['math_bracket_inline', false],
+    ['math_bracket_block', true],
+    ['math_bracket_inline_block', true],
+  ];
 
-    // 循环注册所有规则
-    mathRules.forEach(([ruleName, isBlock]) => {
-      defaultRules[ruleName] = (tokens, idx, _options, _, slf) => {
-        return renderMathNode(tokens, idx, slf, isBlock);
-      };
-    });
-  }
+  mathRules.forEach(([ruleName, isBlock]) => {
+    // eslint-disable-next-line no-unused-vars
+    defaultRules[ruleName] = (tokens, idx) => {
+      return createMathVNode(tokens[idx].content, isBlock)
+    };
+  });
+
 
   defaultRules.fence = function (tokens, idx, options, _, slf) {
     const token = tokens[idx];
@@ -291,12 +235,12 @@ export default function (
     }
     html = xss.process(html);
 
-    const processedHtml = handleMathInHtml(html);
+    computeMathInHtml(html);
 
-    const template = document.createElement('template');
-    template.innerHTML = processedHtml;
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
 
-    return convertNodeToVNode(template.content);
+    return convertNodeToVNode(doc.body);
   }
 
   function convertNodeToVNode(node) {
@@ -337,8 +281,21 @@ export default function (
 
       case Node.COMMENT_NODE: {
         const match = node.textContent.match(MATH_COMMENT_REGEXP);
-        const vnode = match && match[1] && mathVnodeMap[match[1]];
-        return vnode || createVNode(Comment, {}, node.textContent);
+        if (match && match[2]) {
+          const mathType = match[1]; // BLOCK 或 INLINE
+          const formula = match[2]; // 公式内容
+
+          const isBlock = mathType === 'BLOCK';
+          const key = JSON.stringify({ formula, isBlock });
+          let vnode = mathVnodeMap.get(key);
+          if (!vnode) {
+            vnode = createMathVNode(formula, isBlock);
+            mathVnodeMap.set(key, vnode);
+          }
+
+          return vnode;
+        }
+        return createVNode(Comment, {}, node.textContent);
       }
       default:
         return null;
@@ -357,16 +314,6 @@ export default function (
       if (!validateAttrName(attr.name)) {
         continue;
       }
-
-      // 安全性检查 - 敏感属性和URL
-      // if (sensitiveAttrReg.test(attrName) && sensitiveUrlReg.test(attrValue)) {
-      //   attrValue = '';
-      // }
-
-      // 检查 data: URL
-      // if (attrName === 'href' && attrValue.toLowerCase().startsWith('data:')) {
-      //   attrValue = '';
-      // }
 
       attrs[attr.name] = attrValue;
     }
@@ -390,89 +337,20 @@ export default function (
   }
 
   // 处理文本中的数学公式,预处理
-  function handleMathInHtml(html) {
-    const result = [];
-    if (!config || (!config.enableMathBlockInHtml && !config.enableMathInlineInHtml)) {
-      return html;
+  function computeMathInHtml(html) {
+    if (!config.components.math) {
+      return; // 如果没有传递 math 组件，直接返回
     }
 
-    let processedContent = html;
-    let hasMatch = false;
-
-    // 处理块级数学公式 $$...$$
-    if (config.enableMathBlockInHtml) {
-      const matches = Array.from(processedContent.matchAll(math_block_within_html_regex));
-      for (const match of matches) {
-        if (!match.groups) {
-          continue;
-        }
-
-        hasMatch = true;
-        const html_before_math = match.groups.html_before_math;
-        const math = match.groups.math;
-        const html_after_math = match.groups.html_after_math;
-
-        // 添加数学公式前的文本
-        if (html_before_math && html_before_math.trim()) {
-          result.push(html_before_math);
-        }
-
-        // 添加数学公式 VNode - 使用 math 组件
-        if (math) {
-          const id = randomId();
-          result.push(`<!----MARKDOWN_MATH_${id}---->`);
-          mathVnodeMap[id] = createVNode(config.components.math, {
-            isBlock: true,
-            text: math,
-          });
-        }
-
-        if (html_after_math && html_after_math.trim()) {
-          result.push(html_after_math);
-        }
-      }
-    }
-
-    // 处理内联数学公式 $...$
-    if (config.enableMathInlineInHtml) {
-      const matches = Array.from(processedContent.matchAll(math_inline_within_html_regex));
-      for (const match of matches) {
-        if (!match.groups) {
-          continue;
-        }
-
-        hasMatch = true;
-        const html_before_math = match.groups.html_before_math;
-        const math = match.groups.math;
-        const html_after_math = match.groups.html_after_math;
-
-        // 添加数学公式前的文本
-        if (html_before_math && html_before_math.trim()) {
-          result.push(html_before_math);
-        }
-
-        // 添加数学公式 VNode - 使用 math 组件
-        if (math) {
-          const id = randomId();
-          result.push(`<!----MARKDOWN_MATH_${id}---->`);
-          mathVnodeMap[id] = createVNode(config.components.math, {
-            isBlock: false,
-            text: math,
-          });
-        }
-
-        if (html_after_math && html_after_math.trim()) {
-          result.push(html_after_math);
-        }
-      }
-    }
-
-    if (hasMatch) {
-      return result.join('');
-    }
-
-    // 如果没有找到数学公式，返回原始文本
-    return html;
+    const mathFormulas = extractMathFormulas(html);
+    mathFormulas.forEach(({ type, formula }) => {
+      const isBlock = type === 'BLOCK';
+      const key = JSON.stringify({ formula, isBlock });
+      mathVnodeMap.set(key, createVNode(config.components.math, {
+        isBlock,
+        text: formula,
+      }))
+    });
   }
 
   function renderToken(tokens, idx) {
@@ -510,6 +388,19 @@ export default function (
     return result;
   }
 
+  function createMathVNode(formula, isBlock) {
+    if (config.components.math) {
+      return createVNode(config.components.math, {
+        isBlock,
+        text: formula,
+      })
+
+    }
+
+    const mathDelimiter = ''
+    return createVNode(Text, {}, `${mathDelimiter}${formula}${mathDelimiter}`);
+  }
+
   function render(tokens, options, env) {
     const rules = this.rules;
     const vNodeParents = [];
@@ -517,11 +408,6 @@ export default function (
     const result = tokens
       .map((token, i) => {
         processToken(token, env);
-        // if (token.block) {
-        //   if (token.attrSet) {
-        //     token.attrSet(DOM_ATTR_NAME.TOKEN_IDX, i.toString());
-        //   }
-        // }
 
         const type = token.type;
 

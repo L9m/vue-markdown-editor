@@ -48,7 +48,8 @@ const mathRef = ref(null);
 const wrapperTag = computed(() => (props.isBlock ? 'div' : 'span'));
 
 function renderToString(tex, options) {
-  const str = renderKatex(tex, options, props.katexUrl)
+  const displayMode = /\\begin\{(align|equation|gather|cd|alignat)\}/gi.test(tex);
+  const str = renderKatex(tex, { ...options, displayMode }, props.katexUrl)
   return str
 }
 

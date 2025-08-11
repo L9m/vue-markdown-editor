@@ -12,10 +12,10 @@ import createKatexPlugin from '@/plugins/katex';
 import createTodoListPlugin from '@/plugins/todo-list/index';
 import '@/plugins/todo-list/todo-list';
 import createLineNumberPlugin from '@/plugins/line-number/index';
-import createCopyCodePlugin from '@/plugins/copy-code/index';
-import '@/plugins/copy-code/copy-code';
-import createHighLinesPlugin from '@/plugins/highlight-lines/';
-import '@/plugins/highlight-lines/highlight-lines';
+// import createCopyCodePlugin from '@/plugins/copy-code/index';
+// import '@/plugins/copy-code/copy-code';
+// import createHighLinesPlugin from '@/plugins/highlight-lines/';
+// import '@/plugins/highlight-lines/highlight-lines';
 import createMermaidPlugin from '@/plugins/mermaid/npm';
 
 import createCreateCopyCodePreview from '@/plugins/copy-code/preview';
@@ -79,14 +79,13 @@ import GCode from '@/components/renderer/PreCode.vue';
 VueMarkdownEditor.use(createEmojiPlugin())
   .use(
     createKatexPlugin({
-      enableMathBlockInHtml: false,
-      enableMathInlineInHtml: false,
+      enableMathBlockInHtml: true,
+      enableMathInlineInHtml: true,
+      enableBareBlocks: true
     })
   )
   .use(createTodoListPlugin())
   .use(createLineNumberPlugin())
-  .use(createCopyCodePlugin())
-  .use(createHighLinesPlugin())
   .use(createMermaidPlugin())
   .use(createCursorPlugin())
   .use(createAlignPlugin())
@@ -97,8 +96,6 @@ VueMarkdownEditor.use(createEmojiPlugin())
         mermaid: GMermaidVue,
         code: GCode,
       },
-      enableMathBlockInHtml: true,
-      enableMathInlineInHtml: true,
     })
   );
 

@@ -22,7 +22,6 @@
       @upload-image="handleUploadImage"
       @fullscreen-change="handleFullscreenChange"
       @save="handleSave"
-      @copy-code-success="handleCopyCodeSuccess"
       ref="editor"
     />
   </div>
@@ -56,19 +55,16 @@ export default {
     handleSave(v, html) {
       console.log(v, html);
     },
-    handleCopyCodeSuccess(code) {
-      console.log(code);
-    },
 
     async load() {
-      const md = await fetch('./dev/code.md');
+      const md = await fetch('./dev/test1.md');
       const text = await md.text();
       return text
     },
 
     async type() {
       this.text = '';
-      let size = 1;
+      let size = 2;
       let start = 200;
 
       this.text = ''
@@ -77,11 +73,10 @@ export default {
       console.log(fullText.length)
 
       this.text = fullText.substring(0, start)
-      console.time('1')
 
       async function* processChunk() {
         while (start < fullText.length) {
-          await new Promise((resolve) => requestAnimationFrame(resolve));
+          await new Promise((resolve) => setTimeout(resolve, 100));
           
           this.text += fullText.substring(start, (start += size));
           yield start;
@@ -101,7 +96,7 @@ export default {
 
 
 <style >
-.qm-chat-cursor {
+/* .qm-chat-cursor {
   background-image: url(https://media.tenor.com/KwKL5awF9aMAAAAj/minecraft-fox.gif);
   background-size: cover;
   display: inline-block;
@@ -110,5 +105,5 @@ export default {
   position: relative;
   top: 1px;
   width: 16px
-}
+} */
 </style>

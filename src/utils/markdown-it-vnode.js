@@ -6,24 +6,6 @@ const attrNameReg = /^[a-zA-Z_:][a-zA-Z0-9:._-]*$/;
 const attrEventReg = /^on/i;
 const defaultRules = {};
 
-const mathVnodeMap = new Map()
-const MATH_COMMENT_REGEXP = /--MARKDOWN_MATH_(BLOCK|INLINE)_(.*?)--/;
-
-function extractMathFormulas(text) {
-  const mathRegex = /<!----MARKDOWN_MATH_(BLOCK|INLINE)_(.*?)---->/g;
-  const formulas = [];
-  let match;
-
-  while ((match = mathRegex.exec(text)) !== null) {
-    formulas.push({
-      type: match[1], // BLOCK 或 INLINE
-      formula: match[2] // 公式内容
-    });
-  }
-
-  return formulas;
-}
-
 export default function (
   md,
   config = {
@@ -185,7 +167,7 @@ export default function (
   };
 
   defaultRules.text = function (tokens, idx) {
-    return createVNode(Text, {}, tokens[idx].content);
+    return createVNode(Fragment, {}, [createVNode(Text, {}, tokens[idx].content)]);
   };
 
   defaultRules.html_block = function (tokens, idx) {
@@ -210,8 +192,6 @@ export default function (
       return null;
     }
     html = xss.process(html);
-
-    computeMathInHtml(html);
 
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, 'text/html');
@@ -248,6 +228,11 @@ export default function (
 
     switch (node.nodeType) {
       case Node.ELEMENT_NODE:
+        if (node.nodeName.toLowerCase() === 'qmmath') {
+          const dataType = node.getAttribute('data-type');
+          const isBlock = dataType === 'math_block';
+          return createMathVNode(node.textContent.trim(), isBlock);
+        }
         return convertElementToVNode(node);
       case Node.TEXT_NODE:
         if (!text.trim()) {
@@ -256,22 +241,8 @@ export default function (
         return createVNode(Text, {}, text);
 
       case Node.COMMENT_NODE: {
-        const match = node.textContent.match(MATH_COMMENT_REGEXP);
-        if (match && match[2]) {
-          const mathType = match[1]; // BLOCK 或 INLINE
-          const formula = match[2]; // 公式内容
-
-          const isBlock = mathType === 'BLOCK';
-          const key = JSON.stringify({ formula, isBlock });
-          let vnode = mathVnodeMap.get(key);
-          if (!vnode) {
-            vnode = createMathVNode(formula, isBlock);
-            mathVnodeMap.set(key, vnode);
-          }
-
-          return vnode;
-        }
-        return createVNode(Comment, {}, node.textContent);
+        // 注释节点处理保持不变，用于其他可能的注释
+        return null;
       }
       default:
         return null;
@@ -310,23 +281,6 @@ export default function (
     }
 
     return createVNode(tagName, attrs, children);
-  }
-
-  // 处理文本中的数学公式,预处理
-  function computeMathInHtml(html) {
-    if (!config.components.math) {
-      return; // 如果没有传递 math 组件，直接返回
-    }
-
-    const mathFormulas = extractMathFormulas(html);
-    mathFormulas.forEach(({ type, formula }) => {
-      const isBlock = type === 'BLOCK';
-      const key = JSON.stringify({ formula, isBlock });
-      mathVnodeMap.set(key, createVNode(config.components.math, {
-        isBlock,
-        text: formula,
-      }))
-    });
   }
 
   function renderToken(tokens, idx) {
@@ -380,6 +334,8 @@ export default function (
   function render(tokens, options, env) {
     const rules = this.rules;
     const vNodeParents = [];
+
+    console.log('tokens', tokens)
 
     const result = tokens
       .map((token, i) => {

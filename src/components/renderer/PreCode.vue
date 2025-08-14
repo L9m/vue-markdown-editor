@@ -56,6 +56,9 @@
 </template>
 
 <script>
+// eslint-disable-next-line no-unused-vars
+import copyToClipboard from 'copy-to-clipboard';
+
 export default {
   inheritAttrs: false
 }
@@ -73,6 +76,10 @@ const props = defineProps({
   info: {
     type: String,
     default: ''
+  },
+  showLineNumbers: {
+    type: Boolean,
+    default: true
   }
 })
 
@@ -122,10 +129,8 @@ const highlightStates = computed(() => {
 })
 
 const copyCode = () => {
-  navigator.clipboard.writeText(props.text)
+  copyToClipboard(props.text)
 }
-
-const showLineNumbers = computed(() => true) // 可以根据需要调整，例如基于 info 或 prop
 </script>
 
 <style scoped>
@@ -226,7 +231,7 @@ div[class*='v-md-pre-wrapper-'] .highlight-lines .highlighted {
   overflow: hidden;
   color: #999;
   font-size: 85%;
-  line-height: 1.65 !important;
+  line-height: 1.704 !important;
   text-align: right;
   background-color: #f8f8f8;
   border-right: 1px solid #ddd;

@@ -10,13 +10,7 @@ const options = {
     ...svgTagWhiteList,
     ...katexTagWhiteList,
   },
-  allowCommentTag: true, // 允许注释节点
-  onIgnoreTag(tag, html) {
-    // 保留 MARKDOWN_MATH 注释不被转义
-    if (html.match(/^<!----MARKDOWN_MATH_.*?---->$/)) {
-      return html;
-    }
-  },
+  allowCommentTag: false, // 不允许注释节点通过XSS过滤
   onIgnoreTagAttr(tag, name, value) {
     if (
       (svgTagWhiteList[tag] && svgAttrWhiteList.includes(name)) ||

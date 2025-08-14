@@ -12,7 +12,7 @@ import katex from 'katex';
 // 默认 KaTeX 配置
 const defaultKatexOptions = {
   throwOnError: false,
-  errorColor: '#cc0000',
+  errorColor: '#000',
   strict: false,
   macros: {
     '\\overparen': '\\overgroup',

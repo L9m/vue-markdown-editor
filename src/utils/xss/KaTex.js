@@ -26,6 +26,7 @@ export const katexTagWhiteList = {
   mpadded: [],
   mphantom: [],
   mglyph: [],
+  qmmath: ['data-type'],
 };
 
 export const katexAttrWhiteList = [

@@ -612,7 +612,6 @@ function handleMathInHtml(state, mathType, mathMarkup, mathRegex) {
     }
 
     const content = currentToken.content;
-    const markdownName = mathType === 'math_block' ? 'MARKDOWN_MATH_BLOCK' : 'MARKDOWN_MATH_INLINE';
 
 
     // 使用 replace 方法一次性替换所有匹配的数学公式
@@ -627,7 +626,7 @@ function handleMathInHtml(state, mathType, mathMarkup, mathRegex) {
       const html_after_math = groups.html_after_math || '';
 
 
-      const commentMath = `<!----${markdownName}_${math}---->`;
+      const commentMath = `<qmmath data-type="${mathType}">${math}</qmmath>`;
       return `${html_before_math}${commentMath}${html_after_math}`;
     });
 

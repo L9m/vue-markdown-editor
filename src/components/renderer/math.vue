@@ -31,7 +31,7 @@ const props = defineProps({
     type: Object,
     default: () => ({
       webworker: true,
-      displayError: false,
+      throwOnError: false,
       macros: {
         "\\overparen": "\\overgroup"
       }

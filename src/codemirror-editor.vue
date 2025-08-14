@@ -46,7 +46,7 @@
         <v-md-preview
           :text="text"
           :tab-size="tabSize"
-          :debounce="debounce"
+          :typing="false"
           :scroll-container="getPreviewScrollContainer"
           :before-change="beforePreviewChange"
           @change="handleChange"
@@ -74,11 +74,7 @@ const component = {
     codemirrorStyleReset: {
       type: Boolean,
       default: true,
-    },
-    debounce: {
-      type: Number,
-      default: 0,
-    },
+    }
   },
   watch: {
     modelValue() {

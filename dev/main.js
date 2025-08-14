@@ -11,16 +11,11 @@ import '@/plugins/emoji/emoji';
 import createKatexPlugin from '@/plugins/katex';
 import createTodoListPlugin from '@/plugins/todo-list/index';
 import '@/plugins/todo-list/todo-list';
-import createLineNumberPlugin from '@/plugins/line-number/index';
-// import createCopyCodePlugin from '@/plugins/copy-code/index';
-// import '@/plugins/copy-code/copy-code';
-// import createHighLinesPlugin from '@/plugins/highlight-lines/';
 import '@/plugins/highlight-lines/highlight-lines';
 import createMermaidPlugin from '@/plugins/mermaid/npm';
 
 import createCreateCopyCodePreview from '@/plugins/copy-code/preview';
 import createVNodePlugin from '@/plugins/v-node/index';
-import createCursorPlugin from '@/plugins/cursor/index';
 import createAlignPlugin from '@/plugins/align/index';
 
 // import vuepressTheme from '@/theme/vuepress';
@@ -85,9 +80,7 @@ VueMarkdownEditor.use(createEmojiPlugin())
     })
   )
   .use(createTodoListPlugin())
-  .use(createLineNumberPlugin())
   .use(createMermaidPlugin())
-  .use(createCursorPlugin())
   .use(createAlignPlugin())
   .use(
     createVNodePlugin({

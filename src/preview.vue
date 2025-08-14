@@ -1,11 +1,10 @@
 <template>
   <div
     class="v-md-editor-preview"
-    :class="[showCursor ? '': 'hide-cursor']"
     :style="{
       tabSize,
       '-moz-tab-size': tabSize,
-      '-o-tab-size': tabSize
+      '-o-tab-size': tabSize,
     }"
     @click="handlePreviewClick"
   >
@@ -13,27 +12,20 @@
       ref="preview"
       :class="[previewClass]"
     >
-      <!-- 使用 VNode 渲染 (diff-dom) -->
-      <template v-if="isDiffDom">
-        <component
-          v-for="vNode in currentVNode"
-          :key="vNode.key"
-          :is="vNode"
-        />
-      </template>
-      <!-- 使用 HTML 渲染 (传统方式) -->
-      <div
-        v-else
-        v-html="html"
+      <component
+        v-for="vNode in currentVNode"
+        :key="vNode.key"
+        :is="vNode"
       />
     </div>
   </div>
 </template>
 
 <script>
-import { reactive } from 'vue';
-// import xss from '@/utils/xss/index';
+import { reactive, nextTick, h } from 'vue';
 import { VMdParser } from '@/utils/v-md-parser';
+import QMCursor from '@/components/qm-cursor.vue';
+
 
 // mixins
 import PreviewMixin from '@/mixins/preview';
@@ -48,19 +40,38 @@ const component = {
     },
     theme: Object,
     beforeChange: Function,
-    showCursor: Boolean,
+    typing: Boolean,
+    typeOptions: {
+      type: Object,
+      default: () => ({
+        step: 2,
+        interval: 60,
+        style: 'cursor',
+      }),
+    },
   },
-  emits: ['change'],
+  emits: ['change', 'typingStart', 'typing', 'typingEnd'],
   data() {
     return {
-      html: '',
       currentVNode: null,
       isRendering: false,
+      typingIndex: 0,
+      isTyping: false,
     };
   },
   watch: {
-    text() {
-      this.parser();
+    text(newVal, oldVal) {
+      if (!this.typing) {
+        this.typingIndex = newVal?.length || 0;
+        this.parser(this.text);
+        return;
+      }
+
+      if (newVal.indexOf(oldVal) === -1) {
+        this.typingIndex = 0;
+      }
+
+      nextTick(() => this.typewriterStart());
     },
     langConfig() {
       this.parser();
@@ -76,57 +87,119 @@ const component = {
     langConfig() {
       return this.vMdParser.lang.config;
     },
-    // 自动检测是否启用了 diff-dom 插件
-    isDiffDom() {
-      // 检查 markdown 渲染器是否被 diff-dom 插件替换
-      const markdownParser = this.vMdParser?.themeConfig?.markdownParser;
-      if (!markdownParser) return false;
-      
-      // diff-dom 插件会替换 renderer.render 方法的名称
-      const renderFn = markdownParser.renderer?.render;
-      return renderFn && renderFn.name === 'render' && !!markdownParser.renderer.renderAttrs;
-    },
-  },
-  created() {
-    this.parser();
   },
   methods: {
-    handleTextChange() {
-      const next = (text) => {
-        // if (this.showCursor) {
-        //   let tempText = text
-        //   tempText = tempText.replace(' [[qm-private-cursor]]', '')
-        //   text = tempText + ' [[qm-private-cursor]]'
-        // }
-        
-        const vNode = this.$options.vMdParser.parse(text)
-        this.currentVNode = vNode
-        this.html = '' // 清空 HTML
-        
-        this.$emit('change', text, this.html);
-      };
-
-      if (this.beforeChange) {
-        this.beforeChange(this.text, next);
-      } else {
-        next(this.text);
+    parserContent() {
+      let content = this.text || '';
+      if (this.typing && this.isTyping) {
+        content = this.text.slice(0, this.typingIndex) || '';
       }
+      this.parser(content);
     },
 
-    parser() {
+    parser(content) {
       if (this.isRendering) {
-        return
+        return;
       }
       this.isRendering = true;
       requestAnimationFrame(() => {
-        const vNode = this.$options.vMdParser.parse(this.text)
-        this.currentVNode = vNode
-        this.html = ''
-        this.$emit('change', this.text, this.html);
-        this.isRendering = false;
-      });
+        const next = (text) => {
+          const vNode = this.$options.vMdParser.parse(text);
 
-    }
+          if (this.typing && this.isTyping && this.typeOptions.style === 'cursor') {
+            this.insertCursorToDeepestNode(vNode);
+          }
+
+          this.currentVNode = vNode;
+          this.isRendering = false;
+        };
+
+        if (this.beforeChange) {
+          this.beforeChange(content, next);
+        } else {
+          next(content);
+        }
+      });
+    },
+    
+    typewriterEnd () {
+      this.isTyping = false;
+      this.$emit('typingEnd');
+    },
+    
+    typewriterStart() {
+      clearTimeout(this.timer);
+
+      this.isTyping = true;
+      this.$emit('typingStart');
+      const options = { ...this.typeOptions };
+
+      const typingStep = () => {
+        let step = options.step;
+        if (Array.isArray(options.step)) {
+          step = options.step[0] + Math.floor(Math.random() * (options.step[1] - options.step[0]));
+        }
+        this.typingIndex += step;
+        this.parserContent();
+        this.$emit('typing');
+
+        if (this.typingIndex >= this.text.length) {
+          this.typewriterEnd();
+          this.parserContent();
+          return;
+        }
+
+        this.timer = setTimeout(typingStep, options.interval);
+      };
+
+      this.timer = setTimeout(typingStep);
+    },
+
+    /**
+     * 在 vNode 数组中找到最深层的 HTML 标签节点并插入光标
+     */
+    insertCursorToDeepestNode(vNodes) {
+      if (!vNodes?.length) return;
+      
+      const lastNode = vNodes[vNodes.length - 1];
+      const deepestNode = this.findDeepestHtmlNode(lastNode);
+      
+      if (deepestNode) {
+        deepestNode.children = deepestNode.children || [];
+        deepestNode.children.push(h(QMCursor));
+      }
+    },
+
+    /**
+     * 递归查找最深层的 HTML 标签节点
+     */
+    findDeepestHtmlNode(vnode) {
+      if (!vnode) return null;
+      
+      const isHtmlTag = typeof vnode.type === 'string';
+      const hasChildren = vnode.children?.length > 0;
+      
+      if (isHtmlTag) {
+        if (hasChildren) {
+          const deepest = this.findDeepestInChildren(vnode.children);
+          return deepest || vnode;
+        }
+        return vnode;
+      }
+      
+      return hasChildren ? this.findDeepestInChildren(vnode.children) : null;
+    },
+
+    /**
+     * 在子节点数组中查找最深的 HTML 标签节点
+     */
+    findDeepestInChildren(children) {
+      for (let i = children.length - 1; i >= 0; i--) {
+        const deepest = this.findDeepestHtmlNode(children[i]);
+        if (deepest) return deepest;
+      }
+      return null;
+    },
   },
 };
 
@@ -137,8 +210,29 @@ component.vMdParser = new VMdParser();
 export default component;
 </script>
 
-<style lang="scss">
-.hide-cursor .qm-chat-cursor {
-  display: none !important;
-}
+<style lang="scss" scoped>
+
+// :deep() {
+// .qm-chat-cursor {
+//     align-items: center;
+//     display: inline-flex;
+//     position: relative;
+//     width: 20px
+// }
+
+// .qm-chat-cursor:before {
+//     background-image: url(https://gw.alicdn.com/imgextra/i1/O1CN01qPUtnk1KwvitibrhI_!!6000000001229-54-tps-50-50.apng);
+//     background-size: cover;
+//     content: "";
+//     height: 12px;
+//     width: 12px
+// }
+// }
+
+// :deep(.qm-chat-cursor) {
+//   background: linear-gradient(to right, rgba(0,0,0,0.5), rgba(0,0,0,0.5));
+//   background-clip: text;
+//   -webkit-background-clip: text;
+//   -webkit-text-fill-color: transparent;
+// }
 </style>

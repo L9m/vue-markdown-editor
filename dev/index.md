@@ -1,3 +1,5 @@
+[[toc]]
+
 <h1 align="center">Markdown Editor built on Vue</h1>
 
 <p align="center">
@@ -57,3 +59,6 @@ Vue.use(VueMarkdownEditor);
 
 - [ElementUi Scrollbar Component](https://github.com/ElemeFE/element/tree/dev/packages/scrollbar)
 - [vuepress-plugin-container](https://vuepress.github.io/zh/plugins/container/)
+
+- [x] Task
+- [] Task

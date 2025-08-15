@@ -1,4 +1,4 @@
-import { createVNode, Fragment, Comment, Text } from 'vue';
+import { createVNode, Fragment, Text } from 'vue';
 import { escapeHtml, unescapeAll } from 'markdown-it/lib/common/utils';
 import xss from '@/utils/xss/index';
 
@@ -241,7 +241,6 @@ export default function (
         return createVNode(Text, {}, text);
 
       case Node.COMMENT_NODE: {
-        // 注释节点处理保持不变，用于其他可能的注释
         return null;
       }
       default:
@@ -290,13 +289,8 @@ export default function (
       return null;
     }
 
-    // Tight list paragraphs
     if (token.hidden) {
       return createVNode(Fragment, {}, []);
-    }
-
-    if (token.tag === '--') {
-      return createVNode(Comment);
     }
 
     return createVNode(token.tag, this.renderAttrs(token), []);
@@ -336,7 +330,6 @@ export default function (
     const vNodeParents = [];
 
     console.log('tokens', tokens)
-
     const result = tokens
       .map((token, i) => {
         const type = token.type;

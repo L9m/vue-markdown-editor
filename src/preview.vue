@@ -209,30 +209,3 @@ component.vMdParser = new VMdParser();
 
 export default component;
 </script>
-
-<style lang="scss" scoped>
-
-// :deep() {
-// .qm-chat-cursor {
-//     align-items: center;
-//     display: inline-flex;
-//     position: relative;
-//     width: 20px
-// }
-
-// .qm-chat-cursor:before {
-//     background-image: url(https://gw.alicdn.com/imgextra/i1/O1CN01qPUtnk1KwvitibrhI_!!6000000001229-54-tps-50-50.apng);
-//     background-size: cover;
-//     content: "";
-//     height: 12px;
-//     width: 12px
-// }
-// }
-
-// :deep(.qm-chat-cursor) {
-//   background: linear-gradient(to right, rgba(0,0,0,0.5), rgba(0,0,0,0.5));
-//   background-clip: text;
-//   -webkit-background-clip: text;
-//   -webkit-text-fill-color: transparent;
-// }
-</style>

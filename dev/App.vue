@@ -57,26 +57,24 @@ export default {
     },
 
     async load() {
-      const md = await fetch('./dev/test1.md');
+      const md = await fetch('./dev/u.md');
       const text = await md.text();
-      return text
+      return text;
     },
 
     async type() {
       this.text = '';
-      let size = 2;
+      let size = 1;
       let start = 200;
 
       this.text = ''
       const fullText = await this.load()
 
-      console.log(fullText.length)
-
       this.text = fullText.substring(0, start)
 
       async function* processChunk() {
         while (start < fullText.length) {
-          await new Promise((resolve) => setTimeout(resolve, 100));
+          await new Promise((resolve) => setTimeout(resolve, 10));
           
           this.text += fullText.substring(start, (start += size));
           yield start;
@@ -87,8 +85,6 @@ export default {
       for await (const _ of processChunk.call(this)) {
         // console.log('pos', text[pos]);
       }
-
-       console.timeEnd('1')
     },
   }
 };
@@ -96,14 +92,4 @@ export default {
 
 
 <style >
-/* .qm-chat-cursor {
-  background-image: url(https://media.tenor.com/KwKL5awF9aMAAAAj/minecraft-fox.gif);
-  background-size: cover;
-  display: inline-block;
-  height: 16px;
-  margin-left: 4px;
-  position: relative;
-  top: 1px;
-  width: 16px
-} */
 </style>

@@ -4,6 +4,20 @@ import xss from '@/utils/xss/index';
 
 const attrNameReg = /^[a-zA-Z_:][a-zA-Z0-9:._-]*$/;
 const attrEventReg = /^on/i;
+
+// 预编译正则表达式，提高性能
+const OPEN_TAG_REGEX = /^<\s*[a-zA-Z][^>]*>$/;
+const CLOSE_TAG_REGEX = /^<\s*\/\s*[a-zA-Z][^>]*>$/;
+const TAG_NAME_REGEX = /^<\s*\/?([a-zA-Z][^\s>]*)/;
+// 匹配属性：支持 attr="value"、attr='value'、attr=value 和 单独的 attr
+const ATTR_REGEX = /([a-zA-Z_:][a-zA-Z0-9:._-]*)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+)))?/g;
+
+// HTML自闭合标签（void elements）
+const VOID_ELEMENTS = new Set([
+  'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input',
+  'link', 'meta', 'param', 'source', 'track', 'wbr'
+]);
+
 const defaultRules = {};
 
 export default function (
@@ -15,6 +29,120 @@ export default function (
 
   function validateAttrName(name) {
     return attrNameReg.test(name) && !attrEventReg.test(name);
+  }
+
+  // HTML标签转换相关函数
+  function isOpenTag(content) {
+    // 匹配开始标签，排除结束标签和自闭合标签
+    if (!OPEN_TAG_REGEX.test(content) ||
+      content.includes('</') ||
+      content.endsWith('/>')) {
+      return false;
+    }
+
+    // 排除HTML自闭合标签（void elements）
+    const tagName = getTagName(content);
+    return tagName && !VOID_ELEMENTS.has(tagName);
+  }
+
+  function isCloseTag(content) {
+    return CLOSE_TAG_REGEX.test(content);
+  }
+
+  function isVoidElement(content) {
+    // 检查是否为void element（自闭合标签）
+    if (!OPEN_TAG_REGEX.test(content) || content.includes('</')) {
+      return false;
+    }
+
+    const tagName = getTagName(content);
+    return tagName && VOID_ELEMENTS.has(tagName);
+  }
+
+  function getTagName(content) {
+    const match = content.match(TAG_NAME_REGEX);
+    return match ? match[1].toLowerCase() : null;
+  }
+
+  // 解析HTML标签的属性
+  function parseHtmlAttrs(content) {
+    const attrs = [];
+    // 重置正则表达式的lastIndex，确保每次都从头开始匹配
+    ATTR_REGEX.lastIndex = 0;
+    let match;
+
+    while ((match = ATTR_REGEX.exec(content)) !== null) {
+      const attrName = match[1];
+      // match[2], match[3], match[4] 分别对应双引号、单引号、无引号的值
+      const attrValue = match[2] || match[3] || match[4];
+
+      if (attrValue !== undefined) {
+        // 有值的属性：attr="value" 或 attr=value
+        attrs.push([attrName, attrValue]);
+      } else {
+        // 布尔属性：disabled, selected, hidden 等
+        attrs.push([attrName, attrName]); // HTML标准中布尔属性的值通常等于属性名
+      }
+    }
+
+    return attrs.length > 0 ? attrs : null;
+  }
+
+  function transformHtmlInlineTokens(tokens) {
+    const stack = [];
+
+    return tokens.map(token => {
+      if (token.type !== 'html_inline') {
+        return token;
+      }
+
+      const content = token.content;
+
+      if (isVoidElement(content)) {
+        // 处理自闭合标签（void elements）
+        const tagName = getTagName(content);
+        const attrs = parseHtmlAttrs(content);
+        return {
+          ...token,
+          type: 'html_void',
+          tag: tagName,
+          nesting: 0, // 自闭合标签不需要nesting
+          attrs: attrs
+        };
+      }
+
+      if (isOpenTag(content)) {
+        const tagName = getTagName(content);
+        const attrs = parseHtmlAttrs(content); // 解析属性
+        stack.push(tagName);
+        return {
+          ...token, // 保留原始token的所有属性
+          type: 'html_inline_open',
+          tag: tagName,
+          nesting: 1,
+          attrs: attrs // 设置解析出的属性
+        };
+      }
+
+      if (isCloseTag(content)) {
+        const tagName = getTagName(content);
+        const expectedTag = stack.pop();
+
+        // 如果标签不匹配，当作普通html_inline处理
+        if (expectedTag !== tagName) {
+          return token;
+        }
+
+        return {
+          ...token, // 保留原始token的所有属性，包括attrs
+          type: 'html_inline_close',
+          tag: tagName,
+          nesting: -1
+        };
+      }
+
+      return token;
+    });
   }
 
 
@@ -187,6 +315,22 @@ export default function (
     return createHtmlVNode(token.content);
   };
 
+  defaultRules.html_inline_open = function (tokens, idx, options, env, slf) {
+    const token = tokens[idx];
+    return createVNode(token.tag, slf.renderAttrs(token), []);
+  };
+
+  defaultRules.html_inline_close = function () {
+    // 结束标签返回null，完全由nesting机制处理
+    return null;
+  };
+
+  defaultRules.html_void = function (tokens, idx, options, env, slf) {
+    const token = tokens[idx];
+    // 自闭合标签直接创建vnode，不需要children
+    return createVNode(token.tag, slf.renderAttrs(token), []);
+  };
+
   function createHtmlVNode(html) {
     if (!html.trim()) {
       return null;
@@ -329,7 +473,6 @@ export default function (
     const rules = this.rules;
     const vNodeParents = [];
 
-    console.log('tokens', tokens)
     const result = tokens
       .map((token, i) => {
         const type = token.type;
@@ -337,7 +480,9 @@ export default function (
         let vnode = null;
         let parent = null;
         if (type === 'inline') {
-          vnode = createVNode(Fragment, {}, this.render(token.children || [], options, env));
+          // 转换children中的html_inline token
+          const transformedChildren = transformHtmlInlineTokens(token.children || []);
+          vnode = createVNode(Fragment, {}, this.render(transformedChildren, options, env));
         } else if (rules[type]) {
           const result = rules[type](tokens, i, options, env, this);
           if (typeof result === 'string') {

@@ -106,7 +106,6 @@ function inlineMath(state, silent) {
 
   // 检查是否为有效的开始分隔符
   let res = isValidInlineDelim(state, state.pos);
-  console.log(res, res, state.src[state.pos])
   if (!res.can_open) {
     // 如果不能作为开始分隔符，将 '$' 作为普通字符处理
     if (!silent) {
@@ -156,7 +155,6 @@ function inlineMath(state, silent) {
 
   // 检查有效的结束分隔符
   res = isValidInlineDelim(state, match);
-  console.log(res, res)
   if (!res.can_close) {
     if (!silent) {
       state.pending += '$';
@@ -169,7 +167,6 @@ function inlineMath(state, silent) {
     const token = state.push('math_inline', 'math', 0);
     token.markup = '$'; // 标记符
     token.content = state.src.slice(start, match); // 公式内容
-    console.log(token, token)
   }
 
   // 移动位置到结束分隔符之后
@@ -506,8 +503,6 @@ function inlineBareBlock(state, silent) {
 function inlineBracket(state, silent) {
   var start, match, token, pos;
 
-  // TODO: 需要判断是否可以作为开始和结束符号，和检测是否在 HTML 中
-
   // 检查是否以 '\(' 开始
   if (state.src.slice(state.pos, state.pos + 2) !== '\\(') {
     return false;
@@ -543,7 +538,7 @@ function inlineBracket(state, silent) {
   // 检查是否有空内容，即：\(\)。不进行解析。
   if (match - start === 0) {
     if (!silent) {
-      state.pending += '\\(\\(';
+      state.pending += '\\(\\)';
     }
     state.pos = start + 2;
     return true;
@@ -699,7 +694,7 @@ function inlineBracketBlock(state, silent) {
 
   if (match - start === 0) {
     if (!silent) {
-      state.pending += '\\[\\[';
+      state.pending += '\\[\\]';
     }
     state.pos = start + 2;
     return true;
@@ -741,8 +736,6 @@ function handleMathInHtml(state, mathType, mathMarkup, mathRegex) {
     }
 
     const content = currentToken.content; // 获取 HTML 内容
-    console.log('content', content);
-
 
     // 使用 replace 方法一次性替换所有匹配的数学公式
     let processedContent = content.replace(mathRegex, (match, ...args) => {

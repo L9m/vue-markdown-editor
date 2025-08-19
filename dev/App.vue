@@ -57,7 +57,7 @@ export default {
     },
 
     async load() {
-      const md = await fetch('./dev/inline_tag.md');
+      const md = await fetch('./dev/mermaid.md');
       const text = await md.text();
       return text;
     },

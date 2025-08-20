@@ -15,45 +15,42 @@
  * @param {number} pos - 当前位置
  * @returns {Object} 返回包含 can_open 和 can_close 属性的对象
  */
-function isValidInlineDelim(state, pos) {
-  let prevChar;
-  let nextChar;
-  const max = state.posMax;
-  let can_open = true;
-  let can_close = true;
 
-  // 如果当前字符不是 $，则不能作为分隔符
-  if (state.src.charCodeAt(pos) !== 0x24 /* "$" */) {
+function isValidInlineDelim(state, pos) {
+  const prevChar = state.src[pos - 1];
+  const char = state.src[pos];
+  const nextChar = state.src[pos + 1];
+
+  if (char !== '$') {
     return { can_open: false, can_close: false };
   }
 
-  // 获取前一个和后一个字符的字符码
-  prevChar = pos > 0 ? state.src.charCodeAt(pos - 1) : -1;
-  nextChar = pos + 1 <= max ? state.src.charCodeAt(pos + 1) : -1;
-
-  // 检查是否可以作为结束分隔符
+  let canOpen = false;
+  let canClose = false;
   if (
-    prevChar === 0x20 /* " " */ ||
-    prevChar === 0x09 /* \t */ ||
-    (nextChar >= 0x30 /* "0" */ && nextChar <= 0x39) /* "9" */
+    prevChar !== '$' &&
+    prevChar !== '\\' &&
+    (prevChar === undefined || isWhitespace(prevChar) || !isWordCharacterOrNumber(prevChar))
   ) {
-    can_close = false;
+    canOpen = true;
   }
 
-  // 检查是否可以作为开始分隔符
-  if (nextChar === 0x20 /* " " */ || nextChar === 0x09 /* \t */) {
-    can_open = false;
+  if (
+    nextChar !== '$' &&
+    (nextChar == undefined || isWhitespace(nextChar) || !isWordCharacterOrNumber(nextChar))
+  ) {
+    canClose = true;
   }
 
-  // 额外的限制：不能紧贴 $ 或 \ 字符
-  if (prevChar === 0x24 /* "$" */ || prevChar === 0x5C /* "\" */) {
-    can_open = false;
-  }
-  if (nextChar === 0x24 /* "$" */) {
-    can_close = false;
-  }
+  return { can_open: canOpen, can_close: canClose };
+}
 
-  return { can_open, can_close };
+function isWhitespace(char) {
+  return /^\s$/u.test(char);
+}
+
+function isWordCharacterOrNumber(char) {
+  return /^[\w\d]$/u.test(char);
 }
 
 /**
@@ -767,7 +764,11 @@ function handleMathInHtml(state, mathType, mathMarkup, mathRegex) {
  * @param {boolean} options.enableMathBlockInHtml - 是否在 HTML 中启用数学块
  * @param {boolean} options.enableMathInlineInHtml - 是否在 HTML 中启用行内数学
  */
-export default function (md, options) {
+export default function (md, options = {
+  enableBareBlocks: true,
+  enableMathBlockInHtml: true,
+  enableMathInlineInHtml: true,
+}) {
   // 提取选项参数
   const enableBareBlocks = options.enableBareBlocks; // 是否启用裸块支持
   const enableMathBlockInHtml = options.enableMathBlockInHtml; // 是否在 HTML 中启用数学块

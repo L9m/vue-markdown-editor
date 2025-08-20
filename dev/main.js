@@ -67,27 +67,21 @@ VueMarkdownEditor.use(githubTheme, {
 // });
 // Preview.use(githubTheme);
 
-import GMathVue from '@/components/renderer/math.vue';
-import GMermaidVue from '@/components/renderer/mermaid.vue';
-import GCode from '@/components/renderer/PreCode.vue';
+import MDMath from '@/components/renderer/MDMath.vue';
+import MDMermaid from '@/components/renderer/MDMermaid.vue';
+import MDCode from '@/components/renderer/MDCode.vue';
 
 VueMarkdownEditor.use(createEmojiPlugin())
-  .use(
-    createKatexPlugin({
-      enableMathBlockInHtml: true,
-      enableMathInlineInHtml: true,
-      enableBareBlocks: true
-    })
-  )
+  .use(createKatexPlugin())
   .use(createTodoListPlugin())
   .use(createMermaidPlugin())
   .use(createAlignPlugin())
   .use(
     createVNodePlugin({
       components: {
-        math: GMathVue,
-        mermaid: GMermaidVue,
-        code: GCode,
+        math: MDMath,
+        mermaid: MDMermaid,
+        code: MDCode,
       },
     })
   );

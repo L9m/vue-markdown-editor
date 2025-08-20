@@ -813,3 +813,262 @@
         <li><span style="color:#4682b4;">图像支持探索余角关系：</span>随着角度变化，余弦项可为正（锐角）、为0（直角）、为负（钝角），从而影响三边关系。</li>
     </ul>
 </p>
+
+```
+// 在 data() 中添加的状态
+data() {
+  return {
+    // 原有状态...
+
+    // VNode 打字机状态
+    fullVNodeTree: null,        // 完整的 VNode 树
+    currentPath: null,          // 当前位置：{nodePath: [], textIndex: 0}
+  };
+},
+
+// 新增的方法
+methods: {
+  // 原有方法...
+
+  /**
+   * 新的基于 VNode 的解析方法 - 包含所有驱动逻辑
+   */
+  parserContent2() {
+    if (!this.fullVNodeTree) {
+      // 第一次调用，初始化
+      this.fullVNodeTree = this.vMdParser.parse(this.text || '');
+      this.currentPath = this.findFirstTextPath(this.fullVNodeTree);
+    }
+
+    if (!this.currentPath) {
+      // 没有文本节点，直接显示完整树
+      this.currentVNode = this.fullVNodeTree;
+      return;
+    }
+
+    // 检查当前文本节点是否完成
+    const currentNode = this.getNodeByPath(this.fullVNodeTree, this.currentPath.nodePath);
+    const text = this.getVNodeTextContent(currentNode);
+
+    if (this.currentPath.textIndex >= text.length) {
+      // 当前文本节点完成，查找下一个
+      this.currentPath = this.findNextTextPath(this.fullVNodeTree, this.currentPath.nodePath);
+
+      if (!this.currentPath) {
+        // 所有文本节点都完成了
+        this.currentVNode = this.fullVNodeTree;
+        this.typewriterEnd();
+        return;
+      }
+    }
+
+    // 根据当前路径切片 VNode 树
+    const slicedTree = this.sliceVNodeTree(
+      this.fullVNodeTree,
+      this.currentPath.nodePath,
+      this.currentPath.textIndex
+    );
+
+    this.currentVNode = slicedTree;
+
+    // 更新文本索引（为下次调用准备）
+    this.currentPath.textIndex++;
+
+    this.$emit('typing', {
+      currentPath: this.currentPath,
+      currentText: text.slice(0, this.currentPath.textIndex - 1)
+    });
+  },
+
+  /**
+   * 寻找第一个文本节点路径
+   */
+  findFirstTextPath(tree) {
+    const firstNodePath = this.findTextNodePath(tree);
+    return firstNodePath ? { nodePath: firstNodePath, textIndex: 0 } : null;
+  },
+
+  /**
+   * 寻找下一个文本节点路径
+   */
+  findNextTextPath(tree, currentNodePath) {
+    const nextNodePath = this.findTextNodePath(tree, currentNodePath);
+    return nextNodePath ? { nodePath: nextNodePath, textIndex: 0 } : null;
+  },
+
+  /**
+   * 寻找文本节点路径
+   * @param {VNode|Array} tree - VNode 树
+   * @param {Array} afterPath - 在此路径之后寻找，为空则寻找第一个
+   * @returns {Array|null} 文本节点路径
+   */
+  findTextNodePath(tree, afterPath = []) {
+    let foundTarget = afterPath.length === 0;
+
+    const traverse = (node, path) => {
+      if (!node) return null;
+
+      if (Array.isArray(node)) {
+        for (let i = 0; i < node.length; i++) {
+          const result = traverse(node[i], [...path, i]);
+          if (result) return result;
+        }
+        return null;
+      }
+
+      if (this.isTextVNode(node)) {
+        if (foundTarget) {
+          return path;
+        }
+
+        if (this.pathEquals(path, afterPath)) {
+          foundTarget = true;
+        }
+      }
+
+      if (node.children && Array.isArray(node.children)) {
+        for (let i = 0; i < node.children.length; i++) {
+          const result = traverse(node.children[i], [...path, 'children', i]);
+          if (result) return result;
+        }
+      }
+
+      return null;
+    };
+
+    return traverse(tree, []);
+  },
+
+  /**
+   * 根据路径和字符索引切片 VNode 树
+   */
+  sliceVNodeTree(tree, targetPath, textIndex) {
+    if (!tree) return null;
+
+    const cloneTree = (node, path) => {
+      if (!node) return null;
+
+      if (Array.isArray(node)) {
+        const result = [];
+        for (let i = 0; i < node.length; i++) {
+          const cloned = cloneTree(node[i], [...path, i]);
+          if (cloned !== null) {
+            result.push(cloned);
+          } else {
+            break;
+          }
+        }
+        return result;
+      }
+
+      if (this.isTextVNode(node)) {
+        if (this.pathEquals(path, targetPath)) {
+          const text = this.getVNodeTextContent(node);
+          const slicedText = text.slice(0, textIndex);
+          return this.createTextVNode(slicedText);
+        } else if (this.isPathBefore(path, targetPath)) {
+          return this.cloneVNode(node);
+        } else {
+          return null;
+        }
+      }
+
+      const cloned = this.cloneVNode(node);
+      if (node.children && Array.isArray(node.children)) {
+        const clonedChildren = [];
+        for (let i = 0; i < node.children.length; i++) {
+          const childResult = cloneTree(node.children[i], [...path, 'children', i]);
+          if (childResult !== null) {
+            clonedChildren.push(childResult);
+          } else {
+            break;
+          }
+        }
+        cloned.children = clonedChildren;
+      }
+
+      return cloned;
+    };
+
+    return cloneTree(tree, []);
+  },
+
+  // 辅助方法（与之前相同）
+  isTextVNode(node) {
+    const { Text } = this.$options.vMdParser.Vue || {};
+    return node && (node.type === Text || node.type === 'text' || typeof node.children === 'string');
+  },
+
+  getVNodeTextContent(node) {
+    if (this.isTextVNode(node)) {
+      return typeof node.children === 'string' ? node.children : (node.children || '');
+    }
+    return '';
+  },
+
+  getNodeByPath(tree, path) {
+    let current = tree;
+    for (const key of path) {
+      current = current[key];
+      if (!current) return null;
+    }
+    return current;
+  },
+
+  pathEquals(path1, path2) {
+    if (path1.length !== path2.length) return false;
+    return path1.every((item, index) => item === path2[index]);
+  },
+
+  isPathBefore(path1, path2) {
+    const minLength = Math.min(path1.length, path2.length);
+    for (let i = 0; i < minLength; i++) {
+      if (path1[i] < path2[i]) return true;
+      if (path1[i] > path2[i]) return false;
+    }
+    return path1.length < path2.length;
+  },
+
+  cloneVNode(node) {
+    const { createVNode } = this.$options.vMdParser.Vue || {};
+    return createVNode(
+      node.type,
+      node.props ? { ...node.props } : null,
+      node.children
+    );
+  },
+
+  createTextVNode(text) {
+    const { createVNode, Text } = this.$options.vMdParser.Vue || {};
+    return createVNode(Text, {}, text);
+  },
+}
+
+// 修改后的 typewriterStart 方法
+typewriterStart() {
+  clearTimeout(this.timer);
+
+  this.isTyping = true;
+  this.$emit('typingStart');
+
+  // 重置状态
+  this.fullVNodeTree = null;
+  this.currentPath = null;
+
+  const options = { ...this.typeOptions };
+  const interval = options.interval || 16; // 默认 16ms
+
+  const typingStep = () => {
+    // 调用 parserContent2，它包含所有驱动逻辑
+    this.parserContent2();
+
+    // 如果还在打字中，继续下一轮
+    if (this.isTyping) {
+      this.timer = setTimeout(typingStep, interval);
+    }
+  };
+
+  // 开始打字机效果
+  this.timer = setTimeout(typingStep, interval);
+},
+```

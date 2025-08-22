@@ -67,9 +67,9 @@ VueMarkdownEditor.use(githubTheme, {
 // });
 // Preview.use(githubTheme);
 
-import MDMath from '@/components/renderer/MDMath.vue';
-import MDMermaid from '@/components/renderer/MDMermaid.vue';
-import MDCode from '@/components/renderer/MDCode.vue';
+import MDMath from '@/renderer/MDMath.vue';
+import MDMermaid from '@/renderer/MDMermaid.vue';
+import MDCode from '@/renderer/MDCode.vue';
 
 VueMarkdownEditor.use(createEmojiPlugin())
   .use(createKatexPlugin())

@@ -45,7 +45,7 @@ export default {
     },
 
     async load() {
-      const md = await fetch('./dev/tag.md');
+      const md = await fetch('./dev/test1.md');
       const text = await md.text();
       return text;
     },

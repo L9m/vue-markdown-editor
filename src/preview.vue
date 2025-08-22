@@ -8,9 +8,6 @@
     }"
     @click="handlePreviewClick"
   >
-    <div style="position: fixed; top: 0; right: 180px; z-index: 1000">
-      {{ time }}
-    </div>
     <div
       ref="preview"
       :class="[previewClass]"
@@ -35,164 +32,175 @@ import PreviewMixin from '@/mixins/preview';
 let fullVnodeTree = null;
 
 /**
- * 深度优先搜索算法，寻找VNode树中下一个文本节点的路径
- *
- * @param {Object|Array} tree - Vue VNode树或节点数组
- * @param {Array|null} prevPath - 前一个文本节点的路径，null表示查找第一个文本节点
- * @returns {Array|null} 下一个文本节点的路径数组，未找到返回null
+ * 文本节点迭代器 - 专门用于遍历VNode树中的文本节点
  */
-const findNextTextNodePath = (tree, prevPath = null) => {
-  // 标志位：是否已找到前一个文本节点位置
-  let foundPrev = prevPath === null;
+class TextNodeIterator {
+  constructor(tree) {
+    this.tree = tree;
+    this.stack = [];
+    this._initializeStack();
+  }
 
-  const pathsEqual = (path1, path2) => {
-    if (path1.length !== path2.length) return false;
-    for (let i = 0; i < path1.length; i++) {
-      if (path1[i] !== path2[i]) return false;
-    }
-    return true;
-  };
+  _initializeStack() {
+    this.stack.push({ node: this.tree, path: [], index: 0 });
+  }
 
-  /**
-   * 深度优先搜索递归函数
-   * @param {Object|Array} node - 当前遍历的节点
-   * @param {Array} path - 当前路径（可变引用，会被修改）
-   * @returns {Array|null} 找到的文本节点路径副本
-   */
-  const dfs = (node, path) => {
-    if (!node) return null;
+  next() {
+    while (this.stack.length > 0) {
+      const current = this.stack[this.stack.length - 1];
 
-    // 处理节点数组（如children数组）
-    if (Array.isArray(node)) {
-      for (let i = 0; i < node.length; i++) {
-        path.push(i); // 添加数组索引到路径
-        const result = dfs(node[i], path);
-        if (result) {
-          path.pop(); // 恢复路径状态
-          return result;
+      if (Array.isArray(current.node)) {
+        if (current.index < current.node.length) {
+          const child = current.node[current.index];
+          const childPath = [...current.path, current.index];
+          current.index++;
+
+          this.stack.push({ node: child, path: childPath, index: 0 });
+        } else {
+          this.stack.pop();
         }
-        path.pop(); // 恢复路径状态
-      }
-      return null;
-    }
-
-    // 检查是否为文本节点
-    if (node.type === Text) {
-      if (prevPath === null) {
-        // 没有前置路径，返回第一个文本节点
-        return [...path]; // 返回路径副本
-      } else if (!foundPrev && pathsEqual(path, prevPath)) {
-        // 找到前一个文本节点，标记已找到，继续搜索下一个
-        foundPrev = true;
-      } else if (foundPrev) {
-        // 已跳过前一个节点，返回当前文本节点路径
-        return [...path]; // 返回路径副本
-      }
-    }
-
-    // 递归处理子节点
-    if (node.children && Array.isArray(node.children)) {
-      path.push('children'); // 添加children属性到路径
-      const result = dfs(node.children, path);
-      if (result) {
-        path.pop(); // 恢复路径状态
+      } else if (current.node && current.node.type === Text) {
+        // 找到文本节点
+        const result = { done: false, value: current.path };
+        this.stack.pop(); // 移除当前节点，为下次调用做准备
         return result;
+      } else if (current.node && current.node.children && Array.isArray(current.node.children)) {
+        const childrenPath = [...current.path, 'children'];
+        this.stack.pop();
+        this.stack.push({ node: current.node.children, path: childrenPath, index: 0 });
+      } else {
+        this.stack.pop();
       }
-      path.pop(); // 恢复路径状态
     }
 
-    return null;
-  };
-
-  // 从根节点开始搜索，初始路径为空数组
-  return dfs(tree, []);
-};
+    return { done: true, value: null };
+  }
+}
 
 /**
- * 在VNode树的最后一个文本节点后插入QMCursor组件
- * 返回插入光标后的新VNode树
- *
- * @param {Object|Array} tree - Vue VNode树或节点数组
- * @returns {Object|Array} 插入光标后的新VNode树，如果没有文本节点则返回原树
+ * VNode文本迭代器 - 字符级别的遍历控制
  */
-const insertQMCursorAfterLastText = (tree) => {
-  let lastTextPath = null;
+class VNodeTextIterator {
+  constructor(tree, component) {
+    this.tree = tree;
+    this.component = component;
+    this.textNodeIterator = new TextNodeIterator(tree);
+    this.currentPath = null;
+    this.currentTextIndex = 0;
+    this.finished = false;
+    this._moveToNextTextNode();
+  }
 
-  // 深度克隆树结构
-  const cloneTree = (node) => {
-    if (!node) return node;
-
-    if (Array.isArray(node)) {
-      return node.map(cloneTree);
+  _moveToNextTextNode() {
+    const result = this.textNodeIterator.next();
+    if (result.done) {
+      this.finished = true;
+      return false;
     }
 
-    if (typeof node === 'object' && node.type) {
-      const cloned = { ...node };
-      if (node.children) {
-        cloned.children = cloneTree(node.children);
+    this.currentPath = result.value;
+    this.currentTextIndex = 0;
+    return true;
+  }
+
+  next(step = 1) {
+    if (this.finished) {
+      return { done: true };
+    }
+
+    // 获取当前文本节点
+    let currentNode = this.tree;
+    for (const key of this.currentPath) {
+      currentNode = currentNode[key];
+    }
+
+    if (this.currentTextIndex >= currentNode.children.length) {
+      // 当前文本节点已完成，查找下一个
+      if (!this._moveToNextTextNode()) {
+        return { done: true };
       }
-      return cloned;
+    } else {
+      // 在当前文本节点内前进
+      this.currentTextIndex = this.component.getNextCharIndex(
+        currentNode.children,
+        this.currentTextIndex,
+        step
+      );
     }
 
-    return node;
-  };
+    // 更新渲染内容
+    this.component.currentVNode = this.component.sliceVNodeTree(
+      this.tree,
+      this.currentPath,
+      this.currentTextIndex
+    );
 
-  // 先查找最后一个文本节点的路径
-  const findLastTextPath = (node, path) => {
+    return {
+      done: false,
+      value: {
+        path: this.currentPath,
+        textIndex: this.currentTextIndex,
+      },
+    };
+  }
+}
+
+/**
+ * 在VNode树的最后一个文本节点后直接插入QMCursor组件
+ * 直接修改原树，无需克隆，性能最优
+ *
+
+ /**
+ * 在最后的文本位置插入Cursor
+ */
+const insertCursorAfterLastText = (tree) => {
+  let lastTextPath = null;
+  const pathStack = [];
+
+  // 查找最后一个文本节点的路径
+  const findLastTextPath = (node) => {
     if (!node) return;
 
     if (Array.isArray(node)) {
       for (let i = 0; i < node.length; i++) {
-        path.push(i);
-        findLastTextPath(node[i], path);
-        path.pop();
+        pathStack.push(i);
+        findLastTextPath(node[i]);
+        pathStack.pop();
       }
       return;
     }
 
     if (node.type === Text) {
-      lastTextPath = [...path];
+      lastTextPath = [...pathStack];
     }
 
     if (node.children && Array.isArray(node.children)) {
-      path.push('children');
-      findLastTextPath(node.children, path);
-      path.pop();
+      pathStack.push('children');
+      findLastTextPath(node.children);
+      pathStack.pop();
     }
   };
 
-  // 查找最后一个文本节点
-  findLastTextPath(tree, []);
-
-  // 如果没有找到文本节点，返回原树
+  // 查找最后文本节点
+  findLastTextPath(tree);
   if (!lastTextPath) {
     return tree;
   }
 
-  // 克隆树并插入光标
-  const newTree = cloneTree(tree);
-
-  // 获取父容器路径和文本节点索引
+  // 直接插入光标到原树
   const parentPath = lastTextPath.slice(0, -1);
   const textIndex = lastTextPath[lastTextPath.length - 1];
 
-  // 导航到父容器
-  let parent = newTree;
-  for (const pathSegment of parentPath) {
-    parent = parent[pathSegment];
+  let parent = tree;
+  for (const segment of parentPath) {
+    parent = parent[segment];
   }
 
-  // 确保父容器是数组
-  if (!Array.isArray(parent)) {
-    console.warn('Cannot insert cursor: parent is not an array');
-    return newTree;
+  if (Array.isArray(parent)) {
+    parent.splice(textIndex + 1, 0, h(QMCursor));
   }
 
-  // 创建QMCursor组件并插入到文本节点后
-  const qmCursor = h(QMCursor, { key: 'qm-cursor-' + Date.now() });
-  parent.splice(textIndex + 1, 0, qmCursor);
-
-  return newTree;
+  return tree;
 };
 
 const component = {
@@ -221,9 +229,7 @@ const component = {
       currentVNode: null,
       isRendering: false,
       isTyping: false,
-      currentPath: null,
-      currentTextIndex: 0,
-      time: 0,
+      textIterator: null,
     };
   },
   watch: {
@@ -253,34 +259,18 @@ const component = {
   methods: {
     parserContent(step = 1) {
       const start = performance.now();
-      if (!this.currentPath) {
-        this.currentPath = findNextTextNodePath(fullVnodeTree);
+
+      if (!this.textIterator) {
+        return;
       }
 
-      // 根据路径访问节点
-      let currentNode = fullVnodeTree;
-      for (const key of this.currentPath) {
-        currentNode = currentNode[key];
+      const result = this.textIterator.next(step);
+
+      if (result.done) {
+        this.textIterator = null;
       }
 
-      if (this.currentTextIndex >= currentNode.children.length) {
-        this.currentPath = findNextTextNodePath(fullVnodeTree, this.currentPath);
-        this.currentTextIndex = 0;
-      } else {
-        // 获取下一个字符索引，根据step跳过字符
-        this.currentTextIndex = this.getNextCharIndex(
-          currentNode.children,
-          this.currentTextIndex,
-          step
-        );
-      }
-
-      this.currentVNode = this.sliceVNodeTree(
-        fullVnodeTree,
-        this.currentPath,
-        this.currentTextIndex
-      );
-      this.time = performance.now() - start;
+      console.log(performance.now() - start);
     },
 
     // 获取下一个有效字符索引，根据step递增，特殊字符一次性跳过
@@ -372,10 +362,7 @@ const component = {
 
         return null;
       };
-
-      const result = slice(tree, []);
-      this.currentVNode = result;
-      return result;
+      return slice(tree, []);
     },
 
     // 统一的路径比较方法
@@ -402,7 +389,7 @@ const component = {
       const next = (text) => {
         let vNode = this.$options.vMdParser.parse(text);
         if (this.showCursor) {
-          vNode = insertQMCursorAfterLastText(vNode);
+          vNode = insertCursorAfterLastText(vNode);
         }
 
         this.currentVNode = vNode;
@@ -418,6 +405,7 @@ const component = {
 
     typewriterEnd() {
       clearTimeout(this.timer);
+      this.currentVNode = fullVnodeTree;
       this.isTyping = false;
       this.$emit('typingEnd');
     },
@@ -425,6 +413,9 @@ const component = {
     typewriterStart() {
       clearTimeout(this.timer);
       fullVnodeTree = this.$options.vMdParser.parse(this.text);
+
+      // 创建新的迭代器
+      this.textIterator = new VNodeTextIterator(fullVnodeTree, this);
 
       this.isTyping = true;
       this.$emit('typingStart');
@@ -439,7 +430,7 @@ const component = {
         this.parserContent(step);
         this.$emit('typing');
 
-        if (!this.currentPath) {
+        if (!this.textIterator) {
           this.typewriterEnd();
           return;
         }

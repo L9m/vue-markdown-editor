@@ -46,7 +46,6 @@
         <v-md-preview
           :text="text"
           :tab-size="tabSize"
-          :typing="true"
           :scroll-container="getPreviewScrollContainer"
           :before-change="beforePreviewChange"
           @change="handleChange"

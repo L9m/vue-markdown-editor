@@ -65,6 +65,7 @@ module.exports = function getBaseConfig(config = {}) {
             options: {
               filename: 'workers/[name].[contenthash:8].js',
               esModule: false, // 关键：webpack4 + v2 建议关闭 ESM 包装
+              inline: 'fallback', // 内联模式，避免路径问题
             },
           },
         },

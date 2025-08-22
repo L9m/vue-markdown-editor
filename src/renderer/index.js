@@ -26,5 +26,5 @@ export default {
     app.component('mdmermaid', MDMermaid);
   },
 
-  version: '3.3.0-beta.2'
+  version: '3.3.0-beta.3'
 };

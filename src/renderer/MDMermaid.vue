@@ -9,6 +9,7 @@
 
 <script setup>
 import { ref, computed, watch, nextTick, onMounted } from 'vue'
+import mermaid from 'mermaid'
 
 // eslint-disable-next-line no-undef
 const props = defineProps({
@@ -70,16 +71,10 @@ const mergedConfig = computed(() => {
   return { ...defaultMermaidConfig, ...props.mermaidInitializeOptions }
 })
 
-let mermaid = null
 
 // 初始化 Mermaid
 async function initializeMermaid() {
   try {
-    // 动态导入 mermaid
-    if (!mermaid) {
-      const mermaidModule = await import('mermaid')
-      mermaid = mermaidModule.default || mermaidModule
-    }
     
     // 初始化配置
     mermaid.initialize(mergedConfig.value)

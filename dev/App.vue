@@ -1,7 +1,7 @@
 <template>
-  <div style="height: 100vh;">
+  <div style="height: 100vh">
     <v-md-editor
-      :include-level="[1,2, 3, 4, 5, 6]"
+      :include-level="[1, 2, 3, 4, 5, 6]"
       v-model="text"
       height="100vh"
       autofocus
@@ -49,10 +49,8 @@ export default {
       const text = await md.text();
       return text;
     },
-  }
+  },
 };
 </script>
 
-
-<style >
-</style>
+<style></style>

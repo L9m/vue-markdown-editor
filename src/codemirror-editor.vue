@@ -36,7 +36,7 @@
       <div
         class="codemirror-wrapper"
         :class="{
-          'codemirror-reset': codemirrorStyleReset
+          'codemirror-reset': codemirrorStyleReset,
         }"
         ref="codemirrorEditor"
       />
@@ -46,6 +46,8 @@
         <v-md-preview
           :text="text"
           :tab-size="tabSize"
+          :typing="false"
+          :show-cursor="true"
           :scroll-container="getPreviewScrollContainer"
           :before-change="beforePreviewChange"
           @change="handleChange"
@@ -73,7 +75,7 @@ const component = {
     codemirrorStyleReset: {
       type: Boolean,
       default: true,
-    }
+    },
   },
   watch: {
     modelValue() {

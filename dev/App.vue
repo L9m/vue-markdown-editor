@@ -1,6 +1,6 @@
 <template>
   <div style="height: 100vh">
-    <v-md-editor
+    <!-- <v-md-editor
       :include-level="[1, 2, 3, 4, 5, 6]"
       v-model="text"
       height="100vh"
@@ -11,7 +11,8 @@
       @fullscreen-change="handleFullscreenChange"
       @save="handleSave"
       ref="editor"
-    />
+    /> -->
+    <v-md-preview :text="text" />
   </div>
 </template>
 
@@ -21,12 +22,13 @@ import html from './html';
 export default {
   data() {
     return {
-      text: '',
+      text: '# 测试标题\n\n这是一段测试文本',
       html,
+      content: '# 测试标题\n\n这是一段测试文本',
     };
   },
   async mounted() {
-    this.text = await this.load();
+    this.text = '# 测试标题\n\n这是一段测试文本'
   },
   methods: {
     handleFullscreenChange(v) {

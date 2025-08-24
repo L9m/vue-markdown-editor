@@ -10,7 +10,7 @@ module.exports = merge(getBaseConfig(), {
   devServer: {
     open: true,
     progress: true,
-    host: '172.19.161.82',
+    host: 'localhost',
     stats: 'errors-only',
     disableHostCheck: true,
   },

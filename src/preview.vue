@@ -233,13 +233,16 @@ const component = {
     };
   },
   watch: {
-    text() {
-      if (!this.typing) {
-        this.parser(this.text);
-        return;
-      }
+    text: {
+      immediate: true,
+      handler() {
+        if (!this.typing) {
+          this.parser(this.text);
+          return;
+        }
 
-      nextTick(() => this.typewriterStart());
+        nextTick(() => this.typewriterStart());
+      }
     },
     langConfig() {
       this.parser();

@@ -39,46 +39,48 @@ export default ${componentName};
   fs.writeFileSync(path.join(__dirname, `../src/renderer/${componentName}.js`), content);
 }
 
-function buildRendererIndex() {
-  const imports = rendererComponents.map(name => `import ${name} from './${name}.vue';`).join('\n');
-  const exports = rendererComponents.map(name => `  ${name},`).join('\n');
-  
-  const content = `${tips}
-${imports}
-import { renderKatex } from './katexManager.js';
+// function buildRendererIndex() {
+//   const imports = rendererComponents.map(name => `import ${name} from './${name}.vue';`).join('\n');
+//   const exports = rendererComponents.map(name => `  ${name},`).join('\n');
 
-// 导出所有渲染器组件
-export {
-${exports}
-  renderKatex
-};
+//   const content = `${tips}
+// ${imports}
+// import { renderKatex } from './katexManager.js';
 
-// 默认导出包含所有组件的对象
-export default {
-${exports}
-  renderKatex,
+// // 导出所有渲染器组件
+// export {
+// ${exports}
+//   renderKatex
+// };
 
-  // 安装函数，用于 Vue.use()
-  install(app) {
-${rendererComponents.map(name => `    app.component('${name.toLowerCase()}', ${name});`).join('\n')}
-  },
+// // 默认导出包含所有组件的对象
+// export default {
+// ${exports}
+//   renderKatex,
 
-  version: '${version}'
-};
-`;
+//   // 安装函数，用于 Vue.use()
+//   install(app) {
+// ${rendererComponents.map(name => `    app.component('${name.toLowerCase()}', ${name});`).join('\n')}
+//   },
 
-  fs.writeFileSync(path.join(__dirname, '../src/renderer/index.js'), content);
-}
+//   version: '${version}'
+// };
+// `;
+
+//   fs.writeFileSync(path.join(__dirname, '../src/renderer/index.js'), content);
+// }
 
 // 构建单个组件入口文件
-rendererComponents.forEach((componentName) => {
-  buildRendererEntry(componentName);
-});
+if (require.main === module) {
+  rendererComponents.forEach((componentName) => {
+    buildRendererEntry(componentName);
+  });
 
-// 构建总入口文件
-buildRendererIndex();
+  // 构建总入口文件
+  // buildRendererIndex();
 
-console.log('Renderer components build completed!');
+  console.log('Renderer components build completed!');
+}
 
 module.exports = {
   rendererComponents,

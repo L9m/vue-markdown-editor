@@ -9,7 +9,6 @@
 
 <script setup>
 import { ref, computed, watch, nextTick, onMounted } from 'vue'
-import mermaid from 'mermaid'
 
 // eslint-disable-next-line no-undef
 const props = defineProps({
@@ -77,7 +76,7 @@ async function initializeMermaid() {
   try {
     
     // 初始化配置
-    mermaid.initialize(mergedConfig.value)
+    window.mermaid.initialize(mergedConfig.value)
     
     return true
   } catch (error) {
@@ -107,7 +106,7 @@ async function renderMermaid() {
     // 验证语法
     let parseSuccess = false
     try {
-      parseSuccess = mermaid.parse(props.content)
+      parseSuccess = window.mermaid.parse(props.content)
     } catch (e) {
       if (!e.str) {
         console.log('Mermaid parse error:', e)
@@ -119,7 +118,7 @@ async function renderMermaid() {
     // 渲染图表
     if (parseSuccess) {
       await nextTick()
-      mermaid.init(null, mermaidRef.value)
+      window.mermaid.init(null, mermaidRef.value)
     } else {
       showError('Failed to parse mermaid syntax')
     }
@@ -161,8 +160,8 @@ watch(() => props.content, () => {
 
 // 监听配置变化
 watch(mergedConfig, () => {
-  if (mermaid) {
-    mermaid.initialize(mergedConfig.value)
+  if (window.mermaid) {
+    window.mermaid.initialize(mergedConfig.value)
     renderMermaid()
   }
 })
@@ -174,7 +173,7 @@ onMounted(async () => {
 })
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .g-mermaid {
   margin: 1em 0;
   text-align: center;
@@ -196,19 +195,16 @@ onMounted(async () => {
   }
 }
 
-// 深度样式，用于 mermaid 渲染的 SVG
-// :deep(.mermaid) {
-//   svg {
-//     max-width: 100%;
-//     height: auto;
-//   }
-// }
 
-// // 确保与原插件样式兼容
-// :deep(.v-md-mermaid) {
-//   svg {
-//     max-width: 100%;
-//     height: auto;
-//   }
-// }
+.github-markdown-body pre.v-md-mermaid {
+  background-color: unset;
+}
+
+.vuepress-markdown-body pre.v-md-mermaid {
+  background-color: unset;
+}
+
+.vuepress-markdown-body pre.v-md-mermaid code {
+  color: #2c3e50;
+}
 </style>

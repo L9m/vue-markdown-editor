@@ -133,17 +133,50 @@ const copyCode = () => {
 }
 </script>
 
-<style scoped>
-
-  div[class*='v-md-pre-wrapper-'].line-numbers-mode
-  .highlight-lines
-  .highlighted {
+<style>
+.vuepress-markdown-body div[class*='v-md-pre-wrapper-'] .highlight-lines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding-top: 1.3rem;
+  line-height: 1.4;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.vuepress-markdown-body
+div[class*='v-md-pre-wrapper-'].line-numbers-mode
+.highlight-lines
+.highlighted {
   position: relative;
 }
-
-  div[class*='v-md-pre-wrapper-'].line-numbers-mode
-  .highlight-lines
-  .highlighted::before {
+.vuepress-markdown-body
+div[class*='v-md-pre-wrapper-'].line-numbers-mode
+.highlight-lines
+.highlighted::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 3;
+  display: block;
+  width: 3.5rem;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.66);
+  content: ' ';
+}
+.vuepress-markdown-body div[class*='v-md-pre-wrapper-'] .highlight-lines .highlighted {
+  background-color: rgba(0, 0, 0, 0.66);
+}
+.github-markdown-body
+div[class*='v-md-pre-wrapper-'].line-numbers-mode
+.highlight-lines
+.highlighted {
+  position: relative;
+}
+.github-markdown-body
+div[class*='v-md-pre-wrapper-'].line-numbers-mode
+.highlight-lines
+.highlighted::before {
   position: absolute;
   top: 0;
   left: 0;
@@ -154,7 +187,7 @@ const copyCode = () => {
   background-color: rgba(208, 213, 221, 0.66);
   content: ' ';
 }
-div[class*='v-md-pre-wrapper-'] .highlight-lines {
+.github-markdown-body div[class*='v-md-pre-wrapper-'] .highlight-lines {
   position: absolute;
   top: 0;
   left: 0;
@@ -166,16 +199,15 @@ div[class*='v-md-pre-wrapper-'] .highlight-lines {
   -ms-user-select: none;
   user-select: none;
 }
-div[class*='v-md-pre-wrapper-'] .highlight-lines .highlighted {
+.github-markdown-body div[class*='v-md-pre-wrapper-'] .highlight-lines .highlighted {
   background-color: rgba(208, 213, 221, 0.66);
 }
-
 
 .v-md-pre-wrapper.copy-code-mode .v-md-copy-code-btn {
   position: absolute;
   top: 0.4em;
   right: 0.4em;
-  z-index: 99999999999;
+  z-index: 9;
   display: flex;
   align-items: center;
   justify-content: center;

@@ -1,6 +1,6 @@
 {
   "name": "@l9m/v-md-editor",
-  "version": "3.3.0-beta.4",
+  "version": "3.3.0-beta.5",
   "description": "A markdown editor built on Vue",
   "main": "lib/base-editor.js",
   "keywords": [
@@ -38,7 +38,7 @@
     "build:renderer": "node build/build-renderer.js",
     "build:utils": "node build/build-utils.js",
     "build:theme": "webpack --config build/webpack.theme.js",
-    "build:pkg": "npm run build:entry && npm run build:renderer && webpack --config build/webpack.pkg.js && npm run build:theme && npm run build:utils",
+    "build:pkg": "npm run build:entry && npm run build:renderer && webpack --config build/webpack.pkg.js && webpack --config build/webpack.renderer.js && npm run build:theme && npm run build:utils",
     "docs:dev": "vuepress dev docs",
     "docs:build": "vuepress build docs",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s",

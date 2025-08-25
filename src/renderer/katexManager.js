@@ -7,7 +7,6 @@ let isProcessing = false;
 let katexWorker = null;
 let isListenerAttached = false;
 import KatexWorker from './workers/katex-worker.worker.js';
-import katex from 'katex';
 
 // 默认 KaTeX 配置
 const defaultKatexOptions = {
@@ -107,7 +106,7 @@ export function renderKatex(tex, options = {}, katexUrl = '') {
   // 非 Worker 模式，同步渲染
   if (!hasWorkerSupport || !options.webworker) {
     try {
-      const result = katex.renderToString(tex, mergedOptions);
+      const result = window.katex.renderToString(tex, mergedOptions);
       cache.set(tex, result);
       return result;
     } catch (error) {

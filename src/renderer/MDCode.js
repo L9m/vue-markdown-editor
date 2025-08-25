@@ -3,7 +3,7 @@ import MDCode from './MDCode.vue';
 
 // font css
 
-const version = '3.3.0-beta.12';
+const version = '3.3.0';
 
 const install = (app) => {
   app.component(MDCode.name || 'mdcode', MDCode);

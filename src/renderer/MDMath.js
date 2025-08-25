@@ -3,7 +3,7 @@ import MDMath from './MDMath.vue';
 
 // font css
 
-const version = '3.3.0-beta.12';
+const version = '3.3.0';
 
 const install = (app) => {
   app.component(MDMath.name || 'mdmath', MDMath);

@@ -12,7 +12,6 @@ function buildRendererEntry(componentName) {
 import ${componentName} from './${componentName}.vue';
 
 // font css
-import '@/assets/css/font';
 
 const version = '${version}';
 
@@ -42,7 +41,7 @@ export default ${componentName};
 function buildRendererIndex() {
   const imports = rendererComponents.map(name => `import ${name} from './${name}.vue';`).join('\n');
   const exports = rendererComponents.map(name => `  ${name},`).join('\n');
-  
+
   const content = `${tips}
 ${imports}
 import { renderKatex } from './katexManager.js';

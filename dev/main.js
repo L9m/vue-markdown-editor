@@ -11,10 +11,7 @@ import '@/plugins/emoji/emoji';
 import createKatexPlugin from '@/plugins/katex';
 import createTodoListPlugin from '@/plugins/todo-list/index';
 import '@/plugins/todo-list/todo-list';
-import '@/plugins/highlight-lines/highlight-lines';
-import createMermaidPlugin from '@/plugins/mermaid/npm';
 
-import createCreateCopyCodePreview from '@/plugins/copy-code/preview';
 import createVNodePlugin from '@/plugins/v-node/index';
 import createAlignPlugin from '@/plugins/align/index';
 
@@ -47,8 +44,6 @@ import 'codemirror/lib/codemirror.css';
 
 const app = createApp(App);
 
-PreviewHtml.use(createCreateCopyCodePreview());
-
 VueMarkdownEditor.lang.use('zh-CN', enUS);
 
 VueMarkdownEditor.use(githubTheme, {
@@ -74,7 +69,6 @@ import MDCode from '@/renderer/MDCode.vue';
 VueMarkdownEditor.use(createEmojiPlugin())
   .use(createKatexPlugin())
   .use(createTodoListPlugin())
-  .use(createMermaidPlugin())
   .use(createAlignPlugin())
   .use(
     createVNodePlugin({

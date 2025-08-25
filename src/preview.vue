@@ -261,7 +261,6 @@ const component = {
   },
   methods: {
     parserContent(step = 1) {
-      const start = performance.now();
 
       if (!this.textIterator) {
         return;
@@ -273,7 +272,6 @@ const component = {
         this.textIterator = null;
       }
 
-      console.log(performance.now() - start);
     },
 
     // 获取下一个有效字符索引，根据step递增，特殊字符一次性跳过

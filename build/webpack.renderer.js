@@ -2,17 +2,19 @@ const path = require('path');
 const merge = require('webpack-merge');
 const getBaseConfig = require('./webpack.base');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
-const cssnano = require('cssnano');
-const { entryFiles } = require('./build-entry');
+const { rendererComponents } = require('./build-renderer');
 
 const entry = {};
 
-entryFiles.forEach((fileName) => {
-  entry[fileName] = `./src/${fileName}.js`;
+// 添加 renderer 组件入口
+rendererComponents.forEach((componentName) => {
+  entry[`renderer/${componentName}`] = `./src/renderer/${componentName}.js`;
 });
 
-module.exports = merge(getBaseConfig({ useCssExtract: true }), {
+// 添加 renderer 统一入口
+entry['renderer/index'] = './src/renderer/index.js';
+
+module.exports = merge(getBaseConfig({ useCssExtract: false }), {
   mode: 'production',
   entry,
   output: {
@@ -36,14 +38,9 @@ module.exports = merge(getBaseConfig({ useCssExtract: true }), {
     minimize: false,
   },
   plugins: [
-    new CleanWebpackPlugin(),
-    new OptimizeCssAssetsPlugin({
-      assetNameRegExp: /\.css$/g,
-      cssProcessor: cssnano,
-      cssProcessorPluginOptions: {
-        preset: ['default', { discardComments: { removeAll: true } }],
-      },
-      canPrint: true,
+    new CleanWebpackPlugin({
+      cleanOnceBeforeBuildPatterns: ['renderer/**/*'],
+      dangerouslyAllowCleanPatternsOutsideProject: false,
     }),
   ],
 });

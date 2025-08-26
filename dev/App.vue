@@ -1,6 +1,6 @@
 <template>
-  <div style="height: 100vh">
-    <v-md-editor
+  <div>
+    <!-- <v-md-editor
       :include-level="[1, 2, 3, 4, 5, 6]"
       v-model="text"
       height="100vh"
@@ -11,6 +11,11 @@
       @fullscreen-change="handleFullscreenChange"
       @save="handleSave"
       ref="editor"
+    /> -->
+    <v-md-preview
+      :text="text"
+      :typing="true"
+      :show-cursor="true"
     />
   </div>
 </template>
@@ -42,7 +47,7 @@ export default {
     },
 
     async load() {
-      const md = await fetch('./dev/code.md');
+      const md = await fetch('./dev/test1.md');
       const text = await md.text();
       return text;
     },

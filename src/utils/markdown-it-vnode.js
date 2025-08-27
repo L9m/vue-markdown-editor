@@ -1,5 +1,6 @@
 import { createVNode, Fragment, Text } from 'vue';
 import { escapeHtml, unescapeAll } from 'markdown-it/lib/common/utils';
+import { LINE_MARKUP } from './constants/markup';
 import xss from '@/utils/xss/index';
 
 const attrNameReg = /^[a-zA-Z_:][a-zA-Z0-9:._-]*$/;
@@ -26,6 +27,11 @@ export default function (
     components: {},
   }
 ) {
+
+  config = Object.assign({
+    lineNumbers: true,
+    lineMarkup: LINE_MARKUP
+  }, config)
 
   function validateAttrName(name) {
     return attrNameReg.test(name) && !attrEventReg.test(name);
@@ -201,8 +207,9 @@ export default function (
       langAttrs = arr.slice(2).join('');
     }
     if (config.components && config.components.mermaid && langName === 'mermaid') {
+      const attrs = addLineNumber(token, slf.renderAttrs(token));
       return createVNode(config.components.mermaid, {
-        ...slf.renderAttrs(token),
+        ...attrs,
         content: token.content,
         language: langName,
         info: info,
@@ -217,19 +224,19 @@ export default function (
     }
 
     if (highlighted.indexOf('<pre') === 0) {
-      return createHtmlVNode(highlighted);
+      return createHtmlVNode(highlighted, token);
     }
 
     const buildVNode = (attrs) => {
-      const preAttrs = {
+      const preAttrs = addLineNumber(token, {
         'data-info': info,
         'data-lang': langName,
-      };
+      });
 
       if (config.components.code) {
         return createVNode(
           config.components.code,
-          { key: highlighted, ...attrs, text: token.content, info: info, isBlock: true },
+          { key: highlighted, ...addLineNumber(token, attrs), text: token.content, info: info, isBlock: true },
           () => []
         );
       }
@@ -303,7 +310,7 @@ export default function (
     if (token.contentVNode) {
       return token.contentVNode;
     }
-    return createHtmlVNode(token.content);
+    return createHtmlVNode(token.content, token);
   };
 
   defaultRules.html_inline = function (tokens, idx) {
@@ -331,7 +338,7 @@ export default function (
     return createVNode(token.tag, slf.renderAttrs(token), []);
   };
 
-  function createHtmlVNode(html) {
+  function createHtmlVNode(html, token) {
     if (!html.trim()) {
       return null;
     }
@@ -340,15 +347,15 @@ export default function (
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, 'text/html');
 
-    return convertNodeToVNode(doc.body);
+    return convertNodeToVNode(doc.body, token);
   }
 
-  function convertNodeToVNode(node) {
+  function convertNodeToVNode(node, token) {
     const children = [];
 
     for (let i = 0; i < node.childNodes.length; i++) {
       const childNode = node.childNodes[i];
-      const vnode = convertSingleNodeToVNode(childNode);
+      const vnode = convertSingleNodeToVNode(childNode, token);
 
       if (vnode !== null) {
         if (vnode.isMultiple) {
@@ -367,7 +374,7 @@ export default function (
     return createVNode(Fragment, {}, children);
   }
 
-  function convertSingleNodeToVNode(node) {
+  function convertSingleNodeToVNode(node, token) {
     const text = node.textContent;
 
     switch (node.nodeType) {
@@ -377,7 +384,7 @@ export default function (
           const isBlock = dataType === 'math_block';
           return createMathVNode(node.textContent.trim(), isBlock);
         }
-        return convertElementToVNode(node);
+        return convertElementToVNode(node, token);
       case Node.TEXT_NODE:
         if (!text.trim()) {
           return null;
@@ -392,9 +399,11 @@ export default function (
     }
   }
 
-  function convertElementToVNode(element) {
+  function convertElementToVNode(element, token) {
     const tagName = element.tagName.toLowerCase();
-    const attrs = {};
+    const attrs = {
+      ...addLineNumber(token, {}),
+    };
 
     for (let i = 0; i < element.attributes.length; i++) {
       const attr = element.attributes[i];
@@ -411,7 +420,7 @@ export default function (
     const children = [];
     for (let i = 0; i < element.childNodes.length; i++) {
       const childNode = element.childNodes[i];
-      const vnode = convertSingleNodeToVNode(childNode);
+      const vnode = convertSingleNodeToVNode(childNode, token);
 
       if (vnode !== null) {
         if (vnode.isMultiple) {
@@ -437,7 +446,8 @@ export default function (
       return createVNode(Fragment, {}, []);
     }
 
-    return createVNode(token.tag, this.renderAttrs(token), []);
+    const attrs = addLineNumber(token, this.renderAttrs(token));
+    return createVNode(token.tag, attrs, []);
   }
 
   function renderAttrs(token) {
@@ -454,6 +464,14 @@ export default function (
     });
 
     return result;
+  }
+
+  // 添加行号属性的辅助函数
+  function addLineNumber(token, attrs = {}) {
+    if (config.lineNumbers && token.map) {
+      attrs[config.lineMarkup] = token.map[0] + 1;
+    }
+    return attrs;
   }
 
   function createMathVNode(formula, isBlock) {
@@ -486,7 +504,7 @@ export default function (
         } else if (rules[type]) {
           const result = rules[type](tokens, i, options, env, this);
           if (typeof result === 'string') {
-            vnode = createHtmlVNode(result);
+            vnode = createHtmlVNode(result, tokens[i]);
           } else if (result && result.node && result.parent) {
             parent = result.parent;
             vnode = result.node;

@@ -127,5 +127,5 @@ export function renderKatex(tex, options = {}, katexUrl = '') {
     katexUrl,
   });
 
-  return `<span id="katex-${id}" style="display: none"></span>`;
+  return `<span id="katex-${id}">${tex}</span>`;
 }

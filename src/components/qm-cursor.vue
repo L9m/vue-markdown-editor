@@ -13,7 +13,7 @@
 .qm-chat-cursor::before {
   width: 12px;
   height: 12px;
-  background-image: url(https://qm-cloud.oss-cn-chengdu.aliyuncs.com/test/img/ai/ezgif-34ef22d8942f84.png);
+  background-image: url(https://qm-cloud.oss-cn-chengdu.aliyuncs.com/test/img/gif/ezgif-34ef22d8942f84.png);
   background-size: cover;
   content: '';
 }

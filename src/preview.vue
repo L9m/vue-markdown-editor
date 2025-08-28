@@ -214,7 +214,7 @@ const component = {
     theme: Object,
     beforeChange: Function,
     typing: Boolean,
-    showCursor: Boolean,
+    cursor: Boolean,
     typeOptions: {
       type: Object,
       default: () => ({
@@ -314,7 +314,7 @@ const component = {
 
                 const slicedText = text.slice(0, textIndex);
                 result.push({ ...node[i], children: slicedText });
-                if (this.showCursor) {
+                if (this.cursor) {
                   result.push(h(QMCursor));
                 }
               } else {
@@ -389,7 +389,7 @@ const component = {
       this.isRendering = true;
       const next = (text) => {
         let vNode = this.$options.vMdParser.parse(text);
-        if (this.showCursor) {
+        if (this.cursor) {
           vNode = insertCursorAfterLastText(vNode);
         }
 

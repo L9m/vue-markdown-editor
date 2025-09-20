@@ -10,7 +10,7 @@
 /* eslint-env vue/setup-compiler-macros */
 /* global defineProps */
 import { ref, computed } from 'vue';
-import {renderKatex} from './katexManager'
+import { renderKatex } from './katexManager'
 
 const props = defineProps({
   text: {
@@ -38,6 +38,7 @@ const props = defineProps({
     }),
   },
 });
+
 
 // 在模板中使用，但 ESLint 可能无法静态识别
 /* eslint-disable-next-line no-unused-vars */

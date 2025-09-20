@@ -33,6 +33,7 @@ function initializeWorker() {
 
 function displayKatex(data) {
   if (data && data.result) {
+    requestAnimationFrame(() => {
     const placeholderEle = document.querySelector(`#katex-${data.id}`);
     if (placeholderEle) {
       placeholderEle.outerHTML = data.options.displayError && data.error ? data.error : data.result;
@@ -41,8 +42,9 @@ function displayKatex(data) {
       katexWorker.postMessage(messageQueue.shift());
       isProcessing = true;
     } else {
-      isProcessing = false;
-    }
+        isProcessing = false;
+      }
+    });
   }
   if (data && data.error && data.options.displayError) {
     // eslint-disable-next-line no-console

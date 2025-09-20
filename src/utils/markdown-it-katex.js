@@ -17,32 +17,30 @@
  */
 
 function isValidInlineDelim(state, pos) {
-  const prevChar = state.src[pos - 1];
-  const char = state.src[pos];
-  const nextChar = state.src[pos + 1];
+  let prevChar;
+  let nextChar;
+  const max = state.posMax;
+  let can_open = true;
+  let can_close = true;
 
-  if (char !== '$') {
-    return { can_open: false, can_close: false };
-  }
-
-  let canOpen = false;
-  let canClose = false;
-  if (
-    prevChar !== '$' &&
-    prevChar !== '\\' &&
-    (prevChar === undefined || isWhitespace(prevChar) || !isWordCharacterOrNumber(prevChar))
-  ) {
-    canOpen = true;
-  }
+  prevChar = pos > 0 ? state.src.charCodeAt(pos - 1) : -1;
+  nextChar = pos + 1 <= max ? state.src.charCodeAt(pos + 1) : -1;
 
   if (
-    nextChar !== '$' &&
-    (nextChar == undefined || isWhitespace(nextChar) || !isWordCharacterOrNumber(nextChar))
+    prevChar === 0x20 /* " " */ ||
+    prevChar === 0x09 /* \t */ ||
+    (nextChar >= 0x30 /* "0" */ && nextChar <= 0x39) /* "9" */
   ) {
-    canClose = true;
+    can_close = false;
+  }
+  if (nextChar === 0x20 /* " " */ || nextChar === 0x09 /* \t */) {
+    can_open = false;
   }
 
-  return { can_open: canOpen, can_close: canClose };
+  return {
+    can_open,
+    can_close,
+  };
 }
 
 function isWhitespace(char) {
@@ -215,7 +213,7 @@ function blockMath(state, start, end, silent) {
   }
 
   // 循环查找结束标记
-  for (next = start; !found;) {
+  for (next = start; !found; ) {
     next++;
 
     // 如果超过结束位置，退出循环
@@ -599,7 +597,7 @@ function blockBracketMath(state, start, end, silent) {
     return false;
   }
 
-  for (next = start; !found;) {
+  for (next = start; !found; ) {
     next++;
 
     if (next >= end) {
@@ -764,11 +762,14 @@ function handleMathInHtml(state, mathType, mathMarkup, mathRegex) {
  * @param {boolean} options.enableMathBlockInHtml - 是否在 HTML 中启用数学块
  * @param {boolean} options.enableMathInlineInHtml - 是否在 HTML 中启用行内数学
  */
-export default function (md, options = {
-  enableBareBlocks: true,
-  enableMathBlockInHtml: true,
-  enableMathInlineInHtml: true,
-}) {
+export default function (
+  md,
+  options = {
+    enableBareBlocks: true,
+    enableMathBlockInHtml: true,
+    enableMathInlineInHtml: true,
+  }
+) {
   // 提取选项参数
   const enableBareBlocks = options.enableBareBlocks; // 是否启用裸块支持
   const enableMathBlockInHtml = options.enableMathBlockInHtml; // 是否在 HTML 中启用数学块

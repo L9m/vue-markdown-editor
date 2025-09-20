@@ -1,8 +1,13 @@
 export default function (parser) {
   return function createVNodePlugin(options) {
     return {
-      install(VMdEditor) {
-        VMdEditor.vMdParser.use(parser, options);
+      install(VMdEditor, installOptions) {
+        const finalOptions = {
+          ...options,
+          ...installOptions,
+          xss: installOptions?.xss,
+        };
+        VMdEditor.vMdParser.use(parser, finalOptions);
       },
     };
   };

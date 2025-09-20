@@ -1,7 +1,6 @@
 import { createVNode, Fragment, Text } from 'vue';
 import { escapeHtml, unescapeAll } from 'markdown-it/lib/common/utils';
 import { LINE_MARKUP } from './constants/markup';
-import xss from '@/utils/xss/index';
 
 const attrNameReg = /^[a-zA-Z_:][a-zA-Z0-9:._-]*$/;
 const attrEventReg = /^on/i;
@@ -15,8 +14,20 @@ const ATTR_REGEX = /([a-zA-Z_:][a-zA-Z0-9:._-]*)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'
 
 // HTML自闭合标签（void elements）
 const VOID_ELEMENTS = new Set([
-  'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input',
-  'link', 'meta', 'param', 'source', 'track', 'wbr'
+  'area',
+  'base',
+  'br',
+  'col',
+  'embed',
+  'hr',
+  'img',
+  'input',
+  'link',
+  'meta',
+  'param',
+  'source',
+  'track',
+  'wbr',
 ]);
 
 const defaultRules = {};
@@ -27,11 +38,14 @@ export default function (
     components: {},
   }
 ) {
-
-  config = Object.assign({
-    lineNumbers: true,
-    lineMarkup: LINE_MARKUP
-  }, config)
+  config = Object.assign(
+    {
+      lineNumbers: true,
+      lineMarkup: LINE_MARKUP,
+      xss: null, // XSS 过滤器实例
+    },
+    config
+  );
 
   function validateAttrName(name) {
     return attrNameReg.test(name) && !attrEventReg.test(name);
@@ -40,9 +54,7 @@ export default function (
   // HTML标签转换相关函数
   function isOpenTag(content) {
     // 匹配开始标签，排除结束标签和自闭合标签
-    if (!OPEN_TAG_REGEX.test(content) ||
-      content.includes('</') ||
-      content.endsWith('/>')) {
+    if (!OPEN_TAG_REGEX.test(content) || content.includes('</') || content.endsWith('/>')) {
       return false;
     }
 
@@ -97,7 +109,7 @@ export default function (
   function transformHtmlInlineTokens(tokens) {
     const stack = [];
 
-    return tokens.map(token => {
+    return tokens.map((token) => {
       if (token.type !== 'html_inline') {
         return token;
       }
@@ -113,7 +125,7 @@ export default function (
           type: 'html_void',
           tag: tagName,
           nesting: 0, // 自闭合标签不需要nesting
-          attrs: attrs
+          attrs: attrs,
         };
       }
 
@@ -126,7 +138,7 @@ export default function (
           type: 'html_inline_open',
           tag: tagName,
           nesting: 1,
-          attrs: attrs // 设置解析出的属性
+          attrs: attrs, // 设置解析出的属性
         };
       }
 
@@ -143,14 +155,13 @@ export default function (
           ...token, // 保留原始token的所有属性，包括attrs
           type: 'html_inline_close',
           tag: tagName,
-          nesting: -1
+          nesting: -1,
         };
       }
 
       return token;
     });
   }
-
 
   defaultRules.code_inline = function (tokens, idx, _options, _, slf) {
     const token = tokens[idx];
@@ -175,7 +186,6 @@ export default function (
     ]);
   };
 
-
   // 定义规则配置：[ruleName, isBlock]
   const mathRules = [
     ['math_block', true],
@@ -189,10 +199,9 @@ export default function (
 
   mathRules.forEach(([ruleName, isBlock]) => {
     defaultRules[ruleName] = (tokens, idx) => {
-      return createMathVNode(tokens[idx].content, isBlock)
+      return createMathVNode(tokens[idx].content, isBlock);
     };
   });
-
 
   defaultRules.fence = function (tokens, idx, options, _, slf) {
     const token = tokens[idx];
@@ -236,7 +245,13 @@ export default function (
       if (config.components.code) {
         return createVNode(
           config.components.code,
-          { key: highlighted, ...addLineNumber(token, attrs), text: token.content, info: info, isBlock: true },
+          {
+            key: highlighted,
+            ...addLineNumber(token, attrs),
+            text: token.content,
+            info: info,
+            isBlock: true,
+          },
           () => []
         );
       }
@@ -338,14 +353,28 @@ export default function (
     return createVNode(token.tag, slf.renderAttrs(token), []);
   };
 
+  // DOMParser实例复用 - 性能优化
+  let domParser = null;
+  function getDOMParser() {
+    if (!domParser) {
+      domParser = new DOMParser();
+    }
+    return domParser;
+  }
+
   function createHtmlVNode(html, token) {
     if (!html.trim()) {
       return null;
     }
-    html = xss.process(html);
 
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, 'text/html');
+    // 如果配置了 xss 过滤器，则对 HTML 进行过滤
+    let processedHtml = html;
+    if (config.xss && typeof config.xss.process === 'function') {
+      processedHtml = config.xss.process(html);
+    }
+
+    const parser = getDOMParser();
+    const doc = parser.parseFromString(processedHtml, 'text/html');
 
     return convertNodeToVNode(doc.body, token);
   }
@@ -468,7 +497,7 @@ export default function (
 
   // 添加行号属性的辅助函数
   function addLineNumber(token, attrs = {}) {
-    if (config.lineNumbers && token.map) {
+    if (config.lineNumbers && token && token.map) {
       attrs[config.lineMarkup] = token.map[0] + 1;
     }
     return attrs;
@@ -479,11 +508,10 @@ export default function (
       return createVNode(config.components.math, {
         isBlock,
         text: formula,
-      })
-
+      });
     }
 
-    const mathDelimiter = ''
+    const mathDelimiter = '';
     return createVNode(Text, {}, `${mathDelimiter}${formula}${mathDelimiter}`);
   }
 

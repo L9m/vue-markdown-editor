@@ -4,7 +4,7 @@ import MDMermaid from './MDMermaid.vue';
 // font css
 import '@/assets/css/font';
 
-const version = '3.4.2';
+const version = '3.4.3-beta.3';
 
 const install = (app) => {
   app.component(MDMermaid.name || 'mdmermaid', MDMermaid);

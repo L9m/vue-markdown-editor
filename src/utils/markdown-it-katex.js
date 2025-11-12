@@ -174,7 +174,7 @@ function blockMath(state, start, end, silent) {
     return false;
   }
 
-  for (next = start; !found; ) {
+  for (next = start; !found;) {
     next++;
 
     if (next >= end) {
@@ -498,7 +498,7 @@ function blockBracketMath(state, start, end, silent) {
     return false;
   }
 
-  for (next = start; !found; ) {
+  for (next = start; !found;) {
     next++;
 
     if (next >= end) {
@@ -689,7 +689,7 @@ export default function (md, options) {
   const displayError = options.displayError;
   const useSyncCache = options.useSyncCache;
   const useStreamCache = options.useStreamCache;
-  options.output = 'html';
+  options.output = options.output || 'html';
 
   options.macros = {
     "\\overparen": "\\overgroup"
@@ -747,7 +747,7 @@ export default function (md, options) {
     const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
     let result = '';
     for (let i = 0; i < length; i++) {
-        result += letters.charAt(Math.floor(Math.random() * letters.length));
+      result += letters.charAt(Math.floor(Math.random() * letters.length));
     }
     return result;
   }
@@ -798,32 +798,32 @@ export default function (md, options) {
 
       katexWorker.onmessage = function (event) {
         const data = event.data;
-          if (data.result) {
-            const placeholderEle = document.querySelector(`#katex-${data.id}`);
-            if (placeholderEle) {
-              placeholderEle.outerHTML =  displayError && data.error ? data.error : data.result
-            }
-            if (messageQuene.length > 0) {
-              katexWorker.postMessage(messageQuene.shift());
-            } else {
-              isProcess = false
-            }
+        if (data.result) {
+          const placeholderEle = document.querySelector(`#katex-${data.id}`);
+          if (placeholderEle) {
+            placeholderEle.outerHTML = displayError && data.error ? data.error : data.result
+          }
+          if (messageQuene.length > 0) {
+            katexWorker.postMessage(messageQuene.shift());
+          } else {
+            isProcess = false
+          }
 
-            cacheMap.set(data.tex, data.result)
+          cacheMap.set(data.tex, data.result)
         }
-        
+
         if (data.error && options.throwOnError) {
           console.error(data.error, null);
         }
       };
 
-      return function (tex, options, ) {
-          if (cacheMap.has(tex)) {
-            return cacheMap.get(tex)
-          }
+      return function (tex, options,) {
+        if (cacheMap.has(tex)) {
+          return cacheMap.get(tex)
+        }
 
         let id = randomId()
-        processMessageQueue({id, tex, options})
+        processMessageQueue({ id, tex, options })
         return `<span id="katex-${id}" style="display: none"></span>`
       }
     } else {
@@ -839,7 +839,7 @@ export default function (md, options) {
       const key = `${latex}`;
       let result = '';
       if (cacheMap.has(key)) {
-        result =  cacheMap.get(key);
+        result = cacheMap.get(key);
       } else {
         result = renderToString(latex, { ...options, displayMode });
       }
@@ -849,9 +849,8 @@ export default function (md, options) {
       if (options.throwOnError) {
         console.error(error)
       }
-      return `<span class="katex-error" title="${escapeHtml(latex)}">${
-        displayError ? escapeHtml(error + '') : escapeHtml(latex)
-      }</span>`;
+      return `<span class="katex-error" title="${escapeHtml(latex)}">${displayError ? escapeHtml(error + '') : escapeHtml(latex)
+        }</span>`;
     }
   };
 
@@ -865,7 +864,7 @@ export default function (md, options) {
       let result = '';
 
       if (cacheMap.has(key)) {
-          result = cacheMap.get(key)
+        result = cacheMap.get(key)
       } else {
         result = renderToString(latex, { ...options, displayMode: true });
       }
@@ -875,9 +874,8 @@ export default function (md, options) {
       if (options.throwOnError) {
         console.error(error);
       }
-      return `<p class="katex-block katex-error" title="${escapeHtml(latex)}">${
-        displayError ? escapeHtml(error + '') : escapeHtml(latex)
-      }</p>`;
+      return `<p class="katex-block katex-error" title="${escapeHtml(latex)}">${displayError ? escapeHtml(error + '') : escapeHtml(latex)
+        }</p>`;
     }
   };
 

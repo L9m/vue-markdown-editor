@@ -6,6 +6,7 @@
       v-model="text"
       height="500px"
       autofocus
+      left-toolbar="clear undo redo | h bold italic strikethrough quote underline hlc | ul ol table tip hr | link image video code"
       :debounce="0"
       :disabled-menus="[]"
       toc-nav-position-right

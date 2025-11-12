@@ -1,0 +1,64 @@
+.v-md-plugin-hlc p {
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+.v-md-plugin-hlc .v-md-plugin-hlc-title {
+  margin-bottom: -0.4rem;
+  font-weight: 600;
+}
+
+.v-md-plugin-hlc.green,
+.v-md-plugin-hlc.yellow,
+.v-md-plugin-hlc.orange,
+.v-md-plugin-hlc.red {
+  margin: 1rem 0;
+  padding: 0.1rem 1.5rem;
+  background-color: #fff;
+  border-left-width: 0.5rem;
+  border-left-style: solid;
+}
+
+.v-md-plugin-hlc.green {
+  border-color: #0EA98A;
+}
+
+.v-md-plugin-hlc.orange {
+  border-color: #D25F00;
+}
+
+.v-md-plugin-hlc.yellow {
+  border-color: #CC9213;
+}
+
+.v-md-plugin-hlc.red {
+  border-color: #CB2634;
+}
+
+.v-md-editor__menu-item-hlc-green {
+  color: white !important;
+  background: #0EA98A !important;
+  ;
+}
+
+.v-md-editor__menu-item-hlc-orange {
+  color: white !important;
+  background: #D25F00 !important;
+}
+
+.v-md-editor__menu-item-hlc-yellow {
+  color: white !important;
+  background: #CC9213 !important;
+}
+
+.v-md-editor__menu-item-hlc-red {
+  color: white !important;
+  background: #CB2634 !important;
+}
+
+.v-md-editor__menu-item-hlc-green:hover,
+.v-md-editor__menu-item-hlc-orange:hover,
+.v-md-editor__menu-item-hlc-yellow:hover,
+.v-md-editor__menu-item-hlc-red:hover {
+  opacity: 0.85;
+}

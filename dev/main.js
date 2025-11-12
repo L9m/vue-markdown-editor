@@ -17,6 +17,8 @@ import '@/plugins/copy-code/copy-code';
 import createHighLinesPlugin from '@/plugins/highlight-lines/';
 import '@/plugins/highlight-lines/highlight-lines';
 import createMermaidPlugin from '@/plugins/mermaid/npm';
+import createHlcPlugin from '@/plugins/hlc/index'
+import '@/plugins/hlc/hlc.css';
 
 import createCreateCopyCodePreview from '@/plugins/copy-code/preview';
 import createDiffDOMPlugin from '@/plugins/incremental-dom/npm';
@@ -87,6 +89,7 @@ VueMarkdownEditor.use(createEmojiPlugin())
   .use(createMermaidPlugin())
   .use(createCursorPlugin())
   .use(createDiffDOMPlugin())
+  .use(createHlcPlugin())
 
 VueMarkdownEditor.Codemirror = Codemirror;
 

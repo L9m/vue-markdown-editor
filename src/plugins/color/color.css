@@ -1,0 +1,54 @@
+.v-md-plugin-color.green,
+.v-md-plugin-color.yellow,
+.v-md-plugin-color.orange,
+.v-md-plugin-color.red {
+  margin: 1rem 0;
+  padding: 0.1rem 1.5rem;
+  background-color: #fff;
+  border-left-width: 0.5rem;
+  border-left-style: solid;
+}
+
+.v-md-plugin-color.green {
+  border-color: #0EA98A;
+}
+
+.v-md-plugin-color.orange {
+  border-color: #D25F00;
+}
+
+.v-md-plugin-color.yellow {
+  border-color: #CC9213;
+}
+
+.v-md-plugin-color.red {
+  border-color: #CB2634;
+}
+
+.v-md-editor__menu-item-color-green {
+  color: white !important;
+  background: #0EA98A !important;
+  ;
+}
+
+.v-md-editor__menu-item-color-orange {
+  color: white !important;
+  background: #D25F00 !important;
+}
+
+.v-md-editor__menu-item-color-yellow {
+  color: white !important;
+  background: #CC9213 !important;
+}
+
+.v-md-editor__menu-item-color-red {
+  color: white !important;
+  background: #CB2634 !important;
+}
+
+.v-md-editor__menu-item-color-green:hover,
+.v-md-editor__menu-item-color-orange:hover,
+.v-md-editor__menu-item-color-yellow:hover,
+.v-md-editor__menu-item-color-red:hover {
+  opacity: 0.85;
+}

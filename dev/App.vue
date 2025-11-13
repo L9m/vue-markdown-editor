@@ -1,12 +1,14 @@
 <template>
   <div>
-    <button @click="load">加载</button>
+    <button @click="load">
+      加载
+    </button>
     <v-md-editor
       :include-level="[1,2, 3, 4, 5, 6]"
       v-model="text"
       height="500px"
       autofocus
-      left-toolbar="clear undo redo | h bold italic strikethrough quote underline hlc | ul ol table tip hr | link image video code"
+      left-toolbar="clear undo redo | h bold color italic strikethrough quote underline hlc | ul ol table tip hr | link image video code"
       :debounce="0"
       :disabled-menus="[]"
       toc-nav-position-right

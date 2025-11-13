@@ -151,3 +151,27 @@
 .v-new-icon-underline::before {
   content:  "\e7fa";
 }
+
+
+@font-face {
+  font-family: "v-remix-iconfont";
+  src: url('../font/remix/remixicon.woff2') format('woff2'),
+    url('../font/remix/remixicon.woff') format('woff'),
+    url('../font/remix/remixicon.ttf') format('truetype');
+}
+
+[class*='v-remix-icon-'] {
+  font-size: 16px;
+  font-family: 'v-remix-iconfont' !important;
+  font-style: normal !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.v-remix-icon-color::before {
+  content: "\F42E";
+}
+
+.v-remix-icon-hlc::before {
+  content: "\F46D";
+}

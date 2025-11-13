@@ -1,50 +1,48 @@
-import parser from './parser';
-
-export default function createhlcPlugin({ name = 'hlc', icon = 'v-remix-icon-hlc', text } = {}) {
-  const commandHandler = function (editor, type = 'hlc') {
+export default function createcolorPlugin({ name = 'color', icon = 'v-remix-icon-color', text } = {}) {
+  const commandHandler = function (editor, type = '0EA98A') {
     editor.insert((selected) => {
-      const prefix = '\n:::';
-      const suffix = ':::\n';
-      const content = selected || editor.langConfig.hlc[type].placeholder;
+      const prefix = `<span style="color:${type}">`;
+      const suffix = `</span>`;
+      const content = selected || editor.langConfig.color[type].placeholder;
 
       return {
-        text: `${prefix} ${type}\n  ${content}\n${suffix}`,
+        text: `${prefix}${content}${suffix}`,
         selected: content,
       };
     });
   };
 
   const toolbar = {
-    title: (editor) => editor.langConfig.hlc.toolbar,
+    title: (editor) => editor.langConfig.color.toolbar,
     icon,
     text,
     menus: [
       {
-        name: 'hlc-green',
-        text: (editor) => editor.langConfig.hlc.green.toolbar,
+        name: 'color-green',
+        text: (editor) => editor.langConfig.color.green.toolbar,
         action(editor) {
-          editor.execCommand(name, 'green');
+          editor.execCommand(name, '#0EA98A');
         },
       },
       {
-        name: 'hlc-orange',
-        text: (editor) => editor.langConfig.hlc.orange.toolbar,
+        name: 'color-orange',
+        text: (editor) => editor.langConfig.color.orange.toolbar,
         action(editor) {
-          editor.execCommand(name, 'orange');
+          editor.execCommand(name, '#D25F00');
         },
       },
       {
-        name: 'hlc-yellow',
-        text: (editor) => editor.langConfig.hlc.yellow.toolbar,
+        name: 'color-yellow',
+        text: (editor) => editor.langConfig.color.yellow.toolbar,
         action(editor) {
-          editor.execCommand(name, 'yellow');
+          editor.execCommand(name, '#CC9213');
         },
       },
       {
-        name: 'hlc-red',
-        text: (editor) => editor.langConfig.hlc.red.toolbar,
+        name: 'color-red',
+        text: (editor) => editor.langConfig.color.red.toolbar,
         action(editor) {
-          editor.execCommand(name, 'red');
+          editor.execCommand(name, '#CB2634');
         },
       },
     ],
@@ -57,8 +55,8 @@ export default function createhlcPlugin({ name = 'hlc', icon = 'v-remix-icon-hlc
         VMdEditor.toolbar(name, toolbar);
         VMdEditor.lang.add({
           'zh-CN': {
-            hlc: {
-              toolbar: '插入内容',
+            color: {
+              toolbar: '插入颜色',
               green: {
                 toolbar: '绿色',
                 placeholder: '在此输入内容',
@@ -78,8 +76,8 @@ export default function createhlcPlugin({ name = 'hlc', icon = 'v-remix-icon-hlc
             },
           },
           'en-US': {
-            hlc: {
-              toolbar: '插入提示',
+            color: {
+              toolbar: '插入颜色',
               green: {
                 toolbar: '绿色',
                 placeholder: '在此输入内容',
@@ -100,8 +98,6 @@ export default function createhlcPlugin({ name = 'hlc', icon = 'v-remix-icon-hlc
           },
         });
       }
-
-      VMdEditor.vMdParser.use(parser);
     },
   };
 }

@@ -47,6 +47,20 @@ export default function createhlcPlugin({ name = 'hlc', icon = 'v-md-icon-tip', 
           editor.execCommand(name, 'red');
         },
       },
+      {
+        name: 'hlc-tblue',
+        text: (editor) => editor.langConfig.hlc.tblue.toolbar,
+        action(editor) {
+          editor.execCommand(name, 'tblue');
+        },
+      },
+      {
+        name: 'hlc-tblue1',
+        text: (editor) => editor.langConfig.hlc.tblue1.toolbar,
+        action(editor) {
+          editor.execCommand(name, 'tblue1');
+        },
+      },
     ],
   };
 
@@ -75,6 +89,14 @@ export default function createhlcPlugin({ name = 'hlc', icon = 'v-md-icon-tip', 
                 toolbar: '红色',
                 placeholder: '在此输入内容',
               },
+              'tblue': {
+                toolbar: '蓝色一',
+                placeholder: '在此输入内容',
+              },
+              'tblue1': {
+                toolbar: '蓝色二',
+                placeholder: '在此输入内容',
+              },
             },
           },
           'en-US': {
@@ -94,6 +116,14 @@ export default function createhlcPlugin({ name = 'hlc', icon = 'v-md-icon-tip', 
               },
               red: {
                 toolbar: '红色',
+                placeholder: '在此输入内容',
+              },
+              'tblue': {
+                toolbar: '蓝色一',
+                placeholder: '在此输入内容',
+              },
+              'tblue1': {
+                toolbar: '蓝色二',
                 placeholder: '在此输入内容',
               },
             },

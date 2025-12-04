@@ -33,6 +33,16 @@ export default function (vMdParser) {
       defaultTitle: () => getLangConfig().hlc.red.defaultTitle,
       blockClass,
     });
+    markdownItContainer(mdParser, {
+      type: 'tblue',
+      defaultTitle: () => getLangConfig().hlc['tblue'].defaultTitle,
+      blockClass,
+    });
+    markdownItContainer(mdParser, {
+      type: 'tblue1',
+      defaultTitle: () => getLangConfig().hlc['tblue1'].defaultTitle,
+      blockClass,
+    });
   });
 
   vMdParser.lang.add({
@@ -50,6 +60,12 @@ export default function (vMdParser) {
         red: {
           defaultTitle: '',
         },
+        'tblue': {
+          defaultTitle: '',
+        },
+        'tblue1': {
+          defaultTitle: '',
+        },
       },
     },
     'en-US': {
@@ -64,6 +80,12 @@ export default function (vMdParser) {
           defaultTitle: '',
         },
         red: {
+          defaultTitle: '',
+        },
+        'tblue': {
+          defaultTitle: '',
+        },
+        'tblue1': {
           defaultTitle: '',
         },
       },

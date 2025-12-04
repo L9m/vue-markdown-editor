@@ -35,6 +35,23 @@
   border-color: #CB2634;
 }
 
+.v-md-plugin-hlc.tblue {
+  margin: 20px 0;
+  padding: 24px;
+  border-left: 5px solid #0288d1;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(33, 150, 243, 0.15);
+}
+
+
+.v-md-plugin-hlc.tblue1 {
+  margin: 20px 0;
+  padding: 24px;
+  border-left: 5px solid #2196f3;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(33, 150, 243, 0.15);
+}
+
 .v-md-editor__menu-item-hlc-green {
   color: white !important;
   background: #0EA98A !important;
@@ -55,6 +72,17 @@
   color: white !important;
   background: #CB2634 !important;
 }
+
+.v-md-editor__menu-item-hlc-tblue {
+  color: white !important;
+  background: #0288d1 !important;
+}
+
+.v-md-editor__menu-item-hlc-tblue1 {
+  color: white !important;
+  background: #2196f3 !important;
+}
+
 
 .v-md-editor__menu-item-hlc-green:hover,
 .v-md-editor__menu-item-hlc-orange:hover,

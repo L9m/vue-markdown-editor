@@ -42,7 +42,10 @@
       />
     </template>
     <template #preview>
-      <scrollbar ref="previewScroller">
+      <scrollbar
+        @scroll="handlePreviewScroll"
+        ref="previewScroller"
+      >
         <v-md-preview
           :text="text"
           :tab-size="tabSize"
@@ -184,13 +187,14 @@ const component = {
       this.hotkeysManager.registerHotkeys(...arg);
     },
     // Must implement
-    editorScrollToTop(scrollTop) {
+    editorScrollToTop(scrollTop, onScrollEnd) {
       const currentScrollTop = this.getScrollInfo().top;
 
       smooth({
         currentScrollTop,
         scrollToTop: scrollTop,
         scrollFn: (scrollTop) => this.codemirrorInstance.scrollTo(0, scrollTop),
+        onScrollEnd,
       });
     },
     // Must implement

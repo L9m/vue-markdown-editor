@@ -51,7 +51,10 @@
       </scrollbar>
     </template>
     <template #preview>
-      <scrollbar ref="previewScroller">
+      <scrollbar
+        @scroll="handlePreviewScroll"
+        ref="previewScroller"
+      >
         <v-md-preview
           :text="text"
           :tab-size="tabSize"
@@ -146,8 +149,8 @@ const component = {
       this.$refs.editorEgine.registerHotkeys(...arg);
     },
     // Must implement
-    editorScrollToTop(scrollTop) {
-      this.$refs.editorScroller.scrollTo(scrollTop);
+    editorScrollToTop(scrollTop, onScrollEnd) {
+      this.$refs.editorScroller.scrollTo(scrollTop, onScrollEnd);
     },
     // Must implement
     getScrollInfo() {

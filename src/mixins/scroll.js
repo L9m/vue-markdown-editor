@@ -15,8 +15,8 @@ export default {
     },
   },
   methods: {
-    previewScrollTo(scrollTop) {
-      this.$refs.previewScroller.scrollTo(scrollTop);
+    previewScrollTo(scrollTop, onScrollEnd) {
+      this.$refs.previewScroller.scrollTo(scrollTop, onScrollEnd);
     },
     scrollToLine(lineIndex) {
       if (!this.isPreviewMode) {

@@ -758,6 +758,7 @@ export default function (md, options) {
     if (window.Worker && options.useWebWorker) {
       const KatexWorker = `
         importScripts('https://frontend-cdn.qimingdaren.com/cdn/jquery/katex-v3/katex.min.js');
+        importScripts('https://qm-cloud.oss-cn-chengdu.aliyuncs.com/public/js/katex/mhchem.min@0.16.11.js');
 
         const cacheMap = new Map();
 

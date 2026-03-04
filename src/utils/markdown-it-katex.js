@@ -695,6 +695,61 @@ export default function (md, options) {
     "\\overparen": "\\overgroup"
   }
 
+  md.block.ruler.before('table', 'math_in_table', (state, startLine, endLine, silent) => {
+    // 1. 探测是否是表格
+    const tableRule = state.md.block.ruler.__rules__.find(r => r.name === 'table').fn;
+    if (!tableRule(state, startLine, endLine, true)) return false;
+
+    if (silent) return true;
+
+    // 2. 逐行处理表格内容
+    for (let i = startLine; i < endLine; i++) {
+      const lineStart = state.bMarks[i] + state.tShift[i];
+      const lineEnd = state.eMarks[i];
+      const text = state.src.slice(lineStart, lineEnd);
+
+      // 只要行内有 $ 和 | 就处理
+      if (!text.includes('$') || !text.includes('|')) {
+        if (text.trim() === '' && i !== startLine) break;
+        continue;
+      }
+
+      // 3. 执行规范的绝对值替换
+      const newText = text.replace(/(\${1,2})([\s\S]+?)\1/g, (match, tag, content) => {
+        if (!content.includes('|')) return match;
+
+        let processed = content
+          // 替换成对的 |x| 为 \lvert x \rvert
+          .replace(/\|([^|]+)\|/g, '\\lvert $1 \\rvert')
+          // 剩下的孤立 | 替换为 \| (防止干扰列分隔)
+          .replace(/\|/g, '\\|');
+
+        return tag + processed + tag;
+      });
+
+      // 4. 【核心】如果发生了替换，必须更新 state.src 和所有的偏移量
+      if (newText !== text) {
+        const before = state.src.slice(0, lineStart);
+        const after = state.src.slice(lineEnd);
+        state.src = before + newText + after;
+
+        const diff = newText.length - text.length;
+
+        // 更新当前行的结束位置
+        state.eMarks[i] = lineStart + newText.length;
+
+        // 更新后面所有行的起始和结束位置（这是防止丢字的关键）
+        for (let j = i + 1; j < state.bMarks.length; j++) {
+          state.bMarks[j] += diff;
+          state.eMarks[j] += diff;
+        }
+      }
+    }
+
+    // 5. 返回 false，让原生的 table 规则基于我们修改后的“安全”字符串进行解析
+    return false;
+  });
+
   // #region Parsing
   md.inline.ruler.after('escape', 'math_inline', inlineMath);
   md.inline.ruler.after('escape', 'math_inline_block', inlineMathBlock);
@@ -714,7 +769,7 @@ export default function (md, options) {
       return blockMath(state, start, end, silent);
     },
     {
-      alt: ['paragraph', 'reference', 'blockquote', 'list'],
+      alt: ['paragraph', 'reference', 'list'],
     }
   );
 
